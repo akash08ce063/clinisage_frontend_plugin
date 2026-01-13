@@ -51,6 +51,8 @@ interface WidgetState {
     isLoadingPatients: boolean;
     error: string | null;
     notification: { message: string; type: 'info' | 'error' | 'success' } | null;
+    isWaitingForMediaStream: boolean;
+    isDemoMode: boolean;
 }
 
 interface WidgetContextType extends WidgetState {
@@ -86,6 +88,7 @@ interface WidgetContextType extends WidgetState {
     linkPatient: (patientId: string) => Promise<void>;
     notify: (message: string, type?: 'info' | 'error' | 'success') => void;
     clearNotification: () => void;
+    startDemo: (script: string[]) => Promise<void>;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -99,7 +102,6 @@ export const WidgetProvider: React.FC<{
         textColor?: string;
         position?: WidgetPosition;
         authToken?: string;
-        sessionId?: string;
     }
 }> = ({ children, initialConfig }) => {
     const [currentSession, setCurrentSession] = useState<Session | null>(null);
@@ -136,15 +138,18 @@ export const WidgetProvider: React.FC<{
     const [isGeneratingNote, setIsGeneratingNote] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
+    const [isWaitingForMediaStream, setIsWaitingForMediaStream] = useState(false);
 
     const [authToken, setAuthToken] = useState<string | null>(config?.authToken || null);
-    const [sessionId, setSessionIdState] = useState<string | null>(config?.sessionId || null);
+    const [sessionId, setSessionIdState] = useState<string | null>(null);
 
-    // Initial setup for authToken and sessionId from config
+    // Initial setup for authToken from config
     useEffect(() => {
-        if (config?.authToken) setAuthToken(config.authToken);
-        if (config?.sessionId) setSessionIdState(config.sessionId);
-    }, [config?.authToken, config?.sessionId]);
+        if (config?.authToken) {
+            setAuthToken(config.authToken);
+            CookieUtils.setAuthToken(config.authToken);
+        }
+    }, [config?.authToken]);
 
     const setAuthTokenState = useCallback((token: string) => {
         setAuthToken(token);
@@ -156,47 +161,13 @@ export const WidgetProvider: React.FC<{
         setSessionIdState(id);
     }, []);
 
-    // Initial setup for authToken and sessionId
+    // Setup callback for media streaming started event
     useEffect(() => {
-        const setupSession = async () => {
-            console.log('WidgetContext: setupSession triggered with:', { authToken: authToken ? 'YES' : 'NO', sessionId });
-            if (authToken) {
-                CookieUtils.setAuthToken(authToken);
-            }
-
-            if (sessionId) {
-                try {
-                    console.log('WidgetContext: setupSession fetching session for:', sessionId);
-                    const session = await sessionApi.getSessionById(sessionId);
-                    console.log('WidgetContext: setupSession success, setting currentSession:', session.id);
-                    setCurrentSession(session);
-
-                    // Fetch existing notes for this session
-                    setIsLoadingNotes(true);
-                    const notesList = await noteApi.getNotesForSession(sessionId);
-                    setExistingNotes(notesList);
-
-                    if (notesList && notesList.length > 0) {
-                        // Load the latest note by default if no currentNoteId
-                        const latestNote = notesList[notesList.length - 1];
-                        setNotes(latestNote.note_text);
-                        setCurrentNoteId(latestNote.id || null);
-                    }
-                } catch (err) {
-                    console.error('Failed to auto-load session:', err);
-                    setError('Failed to load existing session data');
-                } finally {
-                    setIsLoadingNotes(false);
-                }
-            } else {
-                setCurrentSession(null);
-                setExistingNotes([]);
-                setNotes('');
-            }
-        };
-
-        setupSession();
-    }, [authToken, sessionId]);
+        audioStreamingService.setOnMediaStreamingStarted(() => {
+            console.log('Media streaming started - hiding loader');
+            setIsWaitingForMediaStream(false);
+        });
+    }, []);
 
     const fetchSessions = useCallback(async () => {
         const token = authToken || CookieUtils.getAuthToken();
@@ -392,12 +363,30 @@ export const WidgetProvider: React.FC<{
         }
     }, [currentSession, notify]);
 
-    // Fetch sessions when token is set
+    // Fetch sessions when token is set and auto-select/create
     useEffect(() => {
         if (authToken) {
-            fetchSessions();
+            (async () => {
+                try {
+                    // Avoid double loading if already loading
+                    // setIsLoadingSessions(true); // handled in select/create/fetch? 
+                    // Let's do a direct call pattern for stronger control
+                    const list = await sessionApi.getSessions();
+                    setSessions(list);
+                    if (list.length > 0) {
+                        // Select the most recent session
+                        await selectSession(list[0].id);
+                    } else {
+                        // Create a new session if none exist
+                        await createNewSession('New Session');
+                    }
+                } catch (err) {
+                    console.error('Auto-initialization failed', err);
+                    setError('Failed to initialize session');
+                }
+            })();
         }
-    }, [authToken, fetchSessions]);
+    }, [authToken, selectSession, createNewSession]);
 
     // Fetch templates on mount or when token is set
     useEffect(() => {
@@ -478,6 +467,7 @@ export const WidgetProvider: React.FC<{
         if (isRecording) {
             audioStreamingService.stopRecording();
             setIsRecording(false);
+            setIsWaitingForMediaStream(false);
         } else {
             try {
                 let sessionToUse = currentSession;
@@ -496,6 +486,7 @@ export const WidgetProvider: React.FC<{
                 // 2. Connect if not connected
                 if (!isConnected && sessionToUse) {
                     setIsConnecting(true);
+                    setIsWaitingForMediaStream(true);
                     try {
                         await audioStreamingService.connect(sessionToUse.id);
                         setIsConnected(true);
@@ -512,6 +503,7 @@ export const WidgetProvider: React.FC<{
                 console.error('Failed to start recording:', error);
                 setError(error instanceof Error ? error.message : 'Failed to start recording');
                 setIsRecording(false);
+                setIsWaitingForMediaStream(false);
             }
         }
     }, [isRecording, isConnected, currentSession]);
@@ -642,6 +634,39 @@ export const WidgetProvider: React.FC<{
         }
     }, []);
 
+    const [isDemoMode, setIsDemoMode] = useState(false);
+
+    const startDemo = useCallback(async (script: string[]) => {
+        if (isDemoMode) return;
+        setIsDemoMode(true);
+        setIsConnected(true);
+        setIsRecording(true);
+        setTranscript('');
+
+        // Ensure expanded
+        setIsExpanded(true);
+
+        // Clear existing notes
+        setNotes('');
+        setCurrentNoteId(null);
+
+        for (const line of script) {
+            const words = line.split(' ');
+            for (const word of words) {
+                await new Promise(r => setTimeout(r, 100 + Math.random() * 100));
+                setTranscript(prev => (prev ? prev + ' ' : '') + word);
+            }
+            // Chunk delay
+            await new Promise(r => setTimeout(r, 500));
+        }
+
+        setIsRecording(false);
+        // setIsConnected(false); // Keep connected for visual effect? Or disconnect. 
+        // Disconnecting looks like "call ended" which is appropriate.
+        setIsConnected(false);
+        setIsDemoMode(false);
+    }, [isDemoMode]);
+
     const value = {
         currentSession,
         transcript,
@@ -704,7 +729,10 @@ export const WidgetProvider: React.FC<{
         linkPatient,
         notification,
         notify,
-        clearNotification
+        clearNotification,
+        isWaitingForMediaStream,
+        isDemoMode,
+        startDemo
     };
 
     return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;

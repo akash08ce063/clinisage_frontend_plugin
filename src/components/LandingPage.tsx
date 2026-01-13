@@ -1,257 +1,191 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, Code, Palette, Copy, Eye } from 'lucide-react';
-import { useWidget } from '../contexts/WidgetContext';
-import SpeechWidget from './SpeechWidget';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Database, Brain, Clock, Code } from 'lucide-react';
+import LandingPageWidget from './LandingPageWidget';
+import MockEHR from './MockEHR';
 
-const LandingPage: React.FC = () => {
-    const {
-        themeColor, setThemeColor,
-        backgroundColor, setBackgroundColor,
-        textColor, setTextColor,
-        agentName, setAgentName,
-        position, setPosition,
-    } = useWidget();
+interface LandingPageProps {
+    onLaunchDemo: () => void;
+}
 
-    const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
-    const {
-        authToken, setAuthTokenState,
-    } = useWidget();
-
-    const [localToken, setLocalToken] = useState(authToken || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmE0MTBhLWY5NjEtNDMxOC1hNTA1LTcwMzQ1YjkzYTNmYiIsImVtYWlsIjoiaGFzaEBtYWlsLmNvIiwicm9sZSI6InByYWN0aXRpb25lciIsImV4cCI6MTczODk5NzUxMn0.N612gN5wclC833-D37q-DqId1Y2J88_w8X3yJ8_8X3o');
-
-    // Debounce Token update
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (localToken) setAuthTokenState(localToken);
-        }, 800);
-        return () => clearTimeout(timer);
-    }, [localToken, setAuthTokenState]);
-
-    const snippet = `
-<!--Clinisage Widget Snippet-->
-<script>
-  window.clinisageConfig = {
-    agentName: "${agentName}",
-    themeColor: "${themeColor}",
-    backgroundColor: "${backgroundColor}",
-    textColor: "${textColor}",
-    position: "${position}",
-    authToken: "YOUR_AUTH_TOKEN",
-    sessionId: "YOUR_SESSION_ID"
-  };
-</script>
-<script src="https://cdn.clinisage.ai/widget.v1.js" async></script>
+const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
+    // Demo content constants
+    const demoTranscript = "Patient is a 45-year-old male presenting with persistent cough for 2 weeks. He reports mild shortness of breath on exertion. No history of smoking. Lungs show scattered wheezes bilaterally.";
+    const demoNote = `
+<p><strong>Subjective:</strong> Patient is a 45-year-old male presenting with persistent cough for 2 weeks. Reports mild shortness of breath on exertion. No chest pain reported.</p>
+<p><strong>Objective:</strong><br/>- Vitals: BP 120/80, HR 72.<br/>- Lungs: Scattered wheezes bilaterally.</p>
+<p><strong>Assessment:</strong> Acute bronchitis vs. reactive airway disease.</p>
+<p><strong>Plan:</strong><br/>1. Start Albuterol inhaler PRN.<br/>2. Follow up in 1 week if symptoms persist.</p>
 `.trim();
 
-    const copySnippet = () => {
-        navigator.clipboard.writeText(snippet);
-    };
+    const [activeStep, setActiveStep] = useState<number>(1);
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
-            {/* Header */}
-            <header className="bg-white border-b border-slate-200 px-6 py-4">
-                <div className="w-full">
-                    <h1 className="text-2xl font-bold text-slate-800">Voice Widget Builder</h1>
-                    <p className="text-slate-500 text-sm mt-1">Create and customize your own conversation bar widget</p>
+        <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-teal-100 relative overflow-hidden">
+            {/* Background Decor */}
+            <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-teal-50 to-transparent pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-[600px] h-[600px] bg-sky-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+            <div className="absolute top-40 -left-20 w-[400px] h-[400px] bg-teal-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+
+            {/* Navbar */}
+            <nav className="relative z-10 px-6 py-6 max-w-7xl mx-auto flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-xl">
+                        C
+                    </div>
+                    <span className="text-xl font-bold text-slate-800 tracking-tight">Clinisage</span>
                 </div>
-            </header>
+                <button
+                    onClick={onLaunchDemo}
+                    className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors text-sm"
+                >
+                    <Code className="w-4 h-4" />
+                    Dev Console
+                </button>
+            </nav>
 
-            <main className="flex-1 w-full p-6 flex flex-col lg:flex-row gap-6">
-                {/* Left Panel: Customize Widget */}
-                <aside className="w-full lg:w-[400px] shrink-0">
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden sticky top-8">
-                        <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                                <Settings className="w-4 h-4 text-slate-600" />
-                            </div>
-                            <div>
-                                <h2 className="font-semibold text-slate-800">Customize Widget</h2>
-                                <p className="text-xs text-slate-400">Configure your voice widget appearance and behavior</p>
-                            </div>
+            {/* Hero Section */}
+            <main className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-24 lg:pb-24 flex flex-col items-center text-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                    <span className="inline-block px-4 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold uppercase tracking-widest mb-6 border border-teal-100">
+                        Automated Clinical Documentation
+                    </span>
+                    <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-5xl mx-auto">
+                        Embeddable <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-sky-600">AI Medical Scribe</span> for Any EHR
+                    </h1>
+                    <p className="text-lg lg:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
+                        Integrate a secure AI medical scribe plugin into your EHR to record visits, transcribe conversations, and create structured clinical notes for review.
+                    </p>
+
+                    {/* Interactive Tabbed Control */}
+                    <div className="flex items-center justify-center gap-2 p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 mb-8 w-fit mx-auto">
+                        {[
+                            { id: 1, label: "1. Embed" },
+                            { id: 2, label: "2. Capture" },
+                            { id: 3, label: "3. Process" },
+                            { id: 4, label: "4. Integrate" }
+                        ].map((step) => (
+                            <button
+                                key={step.id}
+                                onClick={() => setActiveStep(step.id as any)}
+                                className={`
+                                    px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300
+                                    ${activeStep === step.id
+                                        ? 'bg-white text-slate-900 shadow-md ring-1 ring-black/5 scale-105'
+                                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                    }
+                                `}
+                            >
+                                {step.label}
+                            </button>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* CTA for Customization */}
+                <div className="flex justify-center mb-8">
+                    <button
+                        onClick={onLaunchDemo}
+                        className="text-slate-500 hover:text-slate-800 font-semibold text-sm flex items-center gap-2 transition-colors"
+                    >
+                        Want to customize this flow?
+                        <span className="underline underline-offset-4">Open Widget Builder</span>
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
+
+                {/* Mock EHR / Preview Section */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                    className="mt-8 relative w-full max-w-6xl mx-auto"
+                >
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
+                        {/* The Mock EHR Dashboard */}
+                        <div className={`transition-all duration-500 ease-in-out ${activeStep === 1 || activeStep === 2 || activeStep === 3 ? 'opacity-40 grayscale-[0.3] scale-[0.99]' : 'opacity-100'}`}>
+                            <MockEHR
+                                noteContent={demoNote}
+                                activeStep={activeStep === 1 ? 0 : activeStep - 1}
+                                onNextStep={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
+                            />
                         </div>
 
-                        <div className="p-6 space-y-6">
-                            {/* Widget Name */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Widget Name</label>
-                                <input
-                                    type="text"
-                                    value={agentName}
-                                    onChange={(e) => setAgentName(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                                    placeholder="Enter widget name..."
-                                />
-                            </div>
-
-                            {/* Colors */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <Palette className="w-4 h-4 text-slate-400" />
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Colors</span>
-                                </div>
-
-                                <ColorInput label="Primary Color" value={themeColor} onChange={setThemeColor} />
-                                <ColorInput label="Background" value={backgroundColor} onChange={setBackgroundColor} />
-                                <ColorInput label="Text Color" value={textColor} onChange={setTextColor} />
-                            </div>
-
-                            {/* Position */}
-                            <div className="space-y-4 pt-2">
-                                <div className="flex items-center gap-2">
-                                    <Settings className="w-4 h-4 text-slate-400" />
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Position</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map((pos) => (
-                                        <button
-                                            key={pos}
-                                            onClick={() => setPosition(pos)}
-                                            className={`px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${position === pos
-                                                ? 'bg-sky-500 border-sky-600 text-white shadow-sm'
-                                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
-                                                }`}
-                                        >
-                                            {pos.replace('-', ' ')}
-                                        </button>
-                                    ))}
+                        {/* Demo Controller & Widget Group */}
+                        <div className="absolute bottom-6 right-6 lg:bottom-12 lg:right-12 z-[100] flex items-end gap-4">
+                            {/* Fast Navigation Controller */}
+                            <div className="flex flex-col gap-2 mb-2">
+                                <button
+                                    onClick={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
+                                    className="px-5 py-2.5 bg-slate-900 shadow-2xl text-white rounded-[20px] font-bold text-xs flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 border border-white/10 whitespace-nowrap"
+                                >
+                                    {activeStep === 1 && "Start Capture"}
+                                    {activeStep === 2 && "Stop & Process"}
+                                    {activeStep === 3 && "View results"}
+                                    {activeStep === 4 && "Try Again"}
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                                <div className="px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 opacity-60 text-center">
+                                    Step {activeStep} of 4
                                 </div>
                             </div>
 
-                            {/* Session Configuration */}
-                            <div className="space-y-4 pt-2">
-                                <div className="flex items-center gap-2">
-                                    <Settings className="w-4 h-4 text-slate-400" />
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Session Configuration</span>
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-semibold text-slate-500 uppercase">Auth Token</label>
-                                        <input
-                                            type="text"
-                                            value={localToken}
-                                            onChange={(e) => setLocalToken(e.target.value)}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-sky-500 transition-all"
-                                            placeholder="Paste JWT token here..."
-                                        />
-                                    </div>
-                                    <p className="text-[9px] text-slate-400 leading-tight">
-                                        Note: Providing these allows real note generation and history fetching in this builder preview.
-                                    </p>
-                                </div>
-                            </div>
+                            <LandingPageWidget
+                                activeStep={activeStep}
+                                transcript={demoTranscript}
+                                notes={demoNote}
+                                themeColor="#0d9488"
+                                onNextStep={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
+                            />
                         </div>
-                    </div>
-                </aside>
 
-                {/* Right Panel: Tabs Preview/Code */}
-                <section className="flex-1 min-h-[600px] flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="flex border-b border-slate-200">
-                        <Tab
-                            item="preview"
-                            active={activeTab === 'preview'}
-                            onClick={() => setActiveTab('preview')}
-                            icon={<Eye className="w-4 h-4" />}
-                            label="Preview"
-                        />
-                        <Tab
-                            item="code"
-                            active={activeTab === 'code'}
-                            onClick={() => setActiveTab('code')}
-                            icon={<Code className="w-4 h-4" />}
-                            label="Code"
-                        />
+                        {/* Shine effect */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
+                </motion.div>
 
-                    <div className="flex-1 relative bg-slate-50/50 flex items-center justify-center p-8">
-                        <AnimatePresence mode="wait">
-                            {activeTab === 'preview' ? (
-                                <motion.div
-                                    key="preview"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="w-full h-full flex items-center justify-center relative"
-                                >
-                                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-                                    <div className={`absolute inset-0 p-8 flex ${position === 'top-left' ? 'items-start justify-start' :
-                                        position === 'top-right' ? 'items-start justify-end' :
-                                            position === 'bottom-left' ? 'items-end justify-start' :
-                                                'items-end justify-end'
-                                        }`}>
-                                        <SpeechWidget inline />
-                                    </div>
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="code"
-                                    initial={{ opacity: 0, scale: 0.98 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.98 }}
-                                    className="w-full max-w-2xl"
-                                >
-                                    <div className="relative group">
-                                        <pre className="bg-slate-900 rounded-xl p-8 text-[13px] leading-relaxed overflow-x-auto font-mono text-sky-300 shadow-xl border border-slate-800">
-                                            <code>{snippet}</code>
-                                        </pre>
-                                        <button
-                                            onClick={copySnippet}
-                                            className="absolute top-4 right-4 p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-sm border border-white/10"
-                                        >
-                                            <Copy className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </section>
+                {/* Feature Highlights */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                    className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl mx-auto text-left"
+                >
+                    <FeatureCard
+                        icon={<Database className="w-6 h-6 text-teal-600" />}
+                        title="EHR Integrated"
+                        description="Seamlessly embeds into your existing workflow with minimal setup."
+                    />
+                    <FeatureCard
+                        icon={<Brain className="w-6 h-6 text-sky-600" />}
+                        title="Context Aware"
+                        description="Understands complex medical terminology and specific patient context."
+                    />
+                    <FeatureCard
+                        icon={<Clock className="w-6 h-6 text-indigo-600" />}
+                        title="Time Saving"
+                        description="Reduces clinical documentation time by up to 40% per patient."
+                    />
+                </motion.div>
             </main>
         </div>
     );
 };
 
-const ColorInput = ({ label, value, onChange }: { label: string, value: string, onChange: (v: string) => void }) => (
-    <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-slate-600">{label}</span>
-        <div className="flex gap-2 items-center">
-            <div
-                className="w-6 h-6 rounded-md border border-slate-200 cursor-pointer shadow-sm relative overflow-hidden"
-                style={{ backgroundColor: value }}
-            >
-                <input
-                    type="color"
-                    value={value.length === 7 ? value : '#000000'}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="opacity-0 absolute inset-0 w-full h-full cursor-pointer p-0 border-0"
-                />
-            </div>
-            <input
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-20 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-[11px] font-mono focus:outline-none focus:ring-1 focus:ring-sky-500"
-            />
+const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+    <div className="p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center mb-4 shadow-sm">
+            {icon}
         </div>
+        <h3 className="text-lg font-bold text-slate-800 mb-2">{title}</h3>
+        <p className="text-slate-500 leading-relaxed text-sm">
+            {description}
+        </p>
     </div>
-);
-
-const Tab = ({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, item: string }) => (
-    <button
-        onClick={onClick}
-        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all relative ${active ? 'text-sky-600' : 'text-slate-400 hover:text-slate-600'
-            }`}
-    >
-        {icon}
-        {label}
-        {active && (
-            <motion.div
-                layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-sky-500 shadow-[0_-4px_12px_rgba(14,165,233,0.3)]"
-            />
-        )}
-    </button>
 );
 
 export default LandingPage;

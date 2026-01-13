@@ -59,8 +59,9 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
     };
 
     useEffect(() => {
-        setLocalNotes(notes);
-        lastSavedContent.current = notes;
+        const contentToUse = notes;
+        setLocalNotes(contentToUse);
+        lastSavedContent.current = contentToUse;
 
         // Aggressively sync the editor DOM
         if (editorRef.current && !isInternalChange.current) {

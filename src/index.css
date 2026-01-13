@@ -24,8 +24,10 @@ body {
 }
 
 @layer base {
-  body {
-    @apply bg-zinc-950 text-zinc-50;
+
+  /* Only apply dark theme background to the main app root (Landing Page), not global body */
+  #root {
+    @apply bg-zinc-950 text-zinc-50 min-h-screen;
   }
 }
 

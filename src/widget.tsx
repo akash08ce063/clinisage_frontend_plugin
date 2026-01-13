@@ -2,64 +2,90 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import SpeechWidget from './components/SpeechWidget';
 import { WidgetProvider } from './contexts/WidgetContext';
-// import './index.css'; // We rely on vite to inject css or emit it
+// Import CSS as raw string for injection into Shadow DOM
+import styles from './index.css?inline';
 
-// Define the window interface to include clinisageConfig
-interface WindowWithConfig extends Window {
-    clinisageConfig?: {
-        agentName?: string;
-        themeColor?: string;
-        backgroundColor?: string;
-        textColor?: string;
-        position?: string;
-        authToken?: string;
-        sessionId?: string;
-    };
-}
+class ClinisageWidget extends HTMLElement {
+    private root: ReactDOM.Root | null = null;
+    private mountPoint: HTMLDivElement | null = null;
 
-declare const window: WindowWithConfig;
+    connectedCallback() {
+        if (this.root) return;
 
-const mountWidget = () => {
-    // Check if configuration exists
-    const config = window.clinisageConfig || {};
+        // Attach Shadow DOM to isolate styles
+        const shadow = this.attachShadow({ mode: 'open' });
 
-    // Create a container for the widget
-    const containerId = 'clinisage-speech-widget-root';
-    let container = document.getElementById(containerId);
+        // Inject Styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        shadow.appendChild(styleSheet);
 
-    if (!container) {
-        container = document.createElement('div');
-        container.id = containerId;
-        document.body.appendChild(container);
+        // Add font link if needed (Inter) - optional but good for consistency
+        const fontLink = document.createElement('link');
+        fontLink.rel = 'stylesheet';
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+        shadow.appendChild(fontLink);
+
+        // Create Mount Point
+        this.mountPoint = document.createElement('div');
+        // Ensure the mount point doesn't have the global dark background
+        this.mountPoint.style.backgroundColor = 'transparent';
+        this.mountPoint.style.minHeight = '0';
+        // Reset base styles that might be set by index.css on body/root if they leak (though shadow protects mostly)
+        // Actually, we need to make sure the widget container itself uses the tailwind base styles
+        // But since we are importing index.css which has @tailwind base, the shadow root will have base styles.
+        // We just need to be careful about body {} styles in index.css applying to the whole shadow root content.
+
+        shadow.appendChild(this.mountPoint);
+
+        // Read Configuration from window
+        const config = (window as any).clinisageConfig || {};
+
+        this.root = ReactDOM.createRoot(this.mountPoint);
+        this.root.render(
+            <React.StrictMode>
+                {/* Provide a container that acts like 'body' for Tailwind base styles if needed, 
+                     but we want transparency. Tailwind 'base' targets 'body' etc. 
+                     Inside shadow DOM, :host is like the root.
+                 */}
+                <WidgetProvider
+                    initialConfig={{
+                        agentName: config.agentName,
+                        themeColor: config.themeColor,
+                        backgroundColor: config.backgroundColor,
+                        textColor: config.textColor,
+                        position: config.position,
+                        authToken: config.authToken
+                    }}
+                >
+                    <SpeechWidget />
+                </WidgetProvider>
+            </React.StrictMode>
+        );
     }
 
-    // Import CSS (Vite will handle bundling this if we import it, 
-    // or we might need to rely on the build system injecting it).
-    // For now assuming Vite injects CSS in JS or we link the style.css manually.
-    // To be safe we should import index.css here.
-    import('./index.css');
+    disconnectedCallback() {
+        if (this.root) {
+            this.root.unmount();
+            this.root = null;
+        }
+    }
+}
 
-    // Mount the widget
-    ReactDOM.createRoot(container).render(
-        <React.StrictMode>
-            <WidgetProvider
-                initialConfig={{
-                    agentName: config.agentName,
-                    themeColor: config.themeColor,
-                    backgroundColor: config.backgroundColor,
-                    textColor: config.textColor,
-                    position: config.position as any,
-                    authToken: config.authToken,
-                    sessionId: config.sessionId
-                }}
-            >
-                <SpeechWidget />
-            </WidgetProvider>
-        </React.StrictMode>
-    );
+// Define the custom element
+const ELEMENT_NAME = 'clinisage-speech-widget';
+if (!customElements.get(ELEMENT_NAME)) {
+    customElements.define(ELEMENT_NAME, ClinisageWidget);
+}
+
+// Auto-inject the element if not present
+const mountWidget = () => {
+    if (!document.querySelector(ELEMENT_NAME)) {
+        const widgetElement = document.createElement(ELEMENT_NAME);
+        document.body.appendChild(widgetElement);
+    }
 };
 
-// Auto-mount when script loads
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mountWidget);
 } else {

@@ -13,7 +13,7 @@ interface ConversationBarProps {
 }
 
 const ConversationBar: React.FC<ConversationBarProps> = ({
-    onExpand,
+    onExpand
 }) => {
     const {
         isConnected,
@@ -36,7 +36,9 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
         fetchNoteDetails,
         isSessionSwitching,
         notification,
-        clearNotification
+        clearNotification,
+        isWaitingForMediaStream,
+        isDemoMode
     } = useWidget();
 
     const [visualizerData, setVisualizerData] = useState<number[]>(new Array(30).fill(0));
@@ -61,26 +63,36 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
     useEffect(() => {
         if (isRecording && !isMuted) {
             const updateVisualizer = () => {
-                const analyser = (audioStreamingService as any).getAnalyser();
-                if (analyser) {
-                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    analyser.getByteFrequencyData(dataArray);
-
-                    const step = Math.floor(dataArray.length / 30);
-                    const newData = [];
-                    for (let i = 0; i < 30; i++) {
-                        newData.push(dataArray[i * step] / 255);
-                    }
+                if (isDemoMode) {
+                    // Simulated visualizer for demo
+                    const newData = Array.from({ length: 30 }, () => Math.random() * 0.8 + 0.1);
                     setVisualizerData(newData);
+                    rafRef.current = requestAnimationFrame(() => {
+                        // Slow down update for demo
+                        setTimeout(updateVisualizer, 80);
+                    });
+                } else {
+                    const analyser = (audioStreamingService as any).getAnalyser();
+                    if (analyser) {
+                        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                        analyser.getByteFrequencyData(dataArray);
+
+                        const step = Math.floor(dataArray.length / 30);
+                        const newData = [];
+                        for (let i = 0; i < 30; i++) {
+                            newData.push(dataArray[i * step] / 255);
+                        }
+                        setVisualizerData(newData);
+                    }
+                    rafRef.current = requestAnimationFrame(updateVisualizer);
                 }
-                rafRef.current = requestAnimationFrame(updateVisualizer);
             };
             updateVisualizer();
         } else {
             setVisualizerData(new Array(30).fill(0));
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
         }
-    }, [isRecording, isMuted]);
+    }, [isRecording, isMuted, isDemoMode]);
 
     const handleToggleConnection = async () => {
         if (isConnected || isRecording) {
@@ -95,14 +107,14 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
             {!isExpanded ? (
                 /* Collapsed State: Pill Bar */
                 <div
-                    className="rounded-2xl border shadow-2xl p-2 flex items-center gap-6 min-w-[400px]"
+                    className="rounded-2xl border shadow-2xl p-2 flex items-center gap-3 sm:gap-6 w-full sm:w-auto sm:min-w-[400px]"
                     style={{
                         backgroundColor: backgroundColor,
                         borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)'
                     }}
                 >
                     <div
-                        className="px-5 py-3 rounded-xl flex-1 ml-1 flex items-center justify-center min-h-[44px]"
+                        className="px-3 sm:px-5 py-3 rounded-xl flex-1 ml-1 flex items-center justify-center min-h-[44px]"
                         style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.1)' }}
                     >
                         {isConnected ? (
@@ -129,7 +141,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-4 pr-3">
+                    <div className="flex items-center gap-2 sm:gap-4 pr-2 sm:pr-3">
                         <IconButton
                             icon={isMuted ? <MicOff className="w-5 h-5 text-red-400" /> : <Mic className="w-5 h-5" />}
                             onClick={() => {
@@ -148,11 +160,11 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                 onExpand?.();
                             }}
                         />
-                        <div className="w-px h-6 mx-1" style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }} />
+                        <div className="hidden sm:block w-px h-6 mx-1" style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }} />
                         <button
                             onClick={handleToggleConnection}
                             disabled={isConnecting}
-                            className={`p-2.5 rounded-full transition-all cursor-pointer ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
+                            className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
                         >
                             <Phone className={`w-5 h-5 ${isConnected || isRecording ? 'rotate-[135deg]' : ''}`} />
                         </button>
@@ -161,11 +173,11 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
             ) : (
                 /* Expanded State: Input + Controls */
                 <div
-                    className="rounded-3xl border shadow-2xl w-full min-w-[400px] flex flex-col overflow-hidden transition-all duration-300"
+                    className="rounded-3xl border shadow-2xl w-full sm:w-[400px] flex flex-col overflow-hidden transition-all duration-300"
                     style={{
                         backgroundColor: backgroundColor,
                         borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)',
-                        height: '480px'
+                        height: 'min(480px, calc(100vh - 2rem))'
                     }}
                 >
                     {/* Notification Toast */}
@@ -185,11 +197,11 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     </AnimatePresence>
 
                     {/* Expanded Header: Session & Patient selectors */}
-                    <div className="p-2 border-b flex items-center gap-2" style={{ borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
+                    <div className="p-2 border-b flex flex-col sm:flex-row items-stretch sm:items-center gap-2" style={{ borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
                         <div className="flex-1 min-w-0">
                             <SessionSelector />
                         </div>
-                        <div className="shrink-0">
+                        <div className="shrink-0 w-full sm:w-auto">
                             <PatientSelector />
                         </div>
                     </div>
@@ -199,7 +211,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                         style={{ borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
                         <button
                             onClick={() => setActiveTab('transcript')}
-                            className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
+                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
                             style={{
                                 backgroundColor: activeTab === 'transcript'
                                     ? (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
@@ -208,7 +220,8 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                             }}
                         >
                             <MessageSquare className="w-3.5 h-3.5" />
-                            Transcript
+                            <span className="hidden sm:inline">Transcript</span>
+                            <span className="sm:hidden">Text</span>
                         </button>
 
                         <button
@@ -220,7 +233,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                     fetchNoteDetails(latestNote.id);
                                 }
                             }}
-                            className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
+                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
                             style={{
                                 backgroundColor: activeTab === 'notes'
                                     ? (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
@@ -238,6 +251,15 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                         className="flex-1 relative rounded-xl m-1 mb-2"
                         style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
                     >
+                        {/* Media Streaming Loading Overlay */}
+                        {isWaitingForMediaStream && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400 z-30 backdrop-blur-sm"
+                                style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)' }}>
+                                <Loader2 className="w-6 h-6 animate-spin" style={{ color: themeColor }} />
+                                <p className="text-[11px] font-bold uppercase tracking-widest">Initializing Media Stream...</p>
+                            </div>
+                        )}
+
                         {isSessionSwitching ? (
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400 z-20">
                                 <Loader2 className="w-5 h-5 animate-spin text-sky-500" />
@@ -288,7 +310,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     {/* Bottom Controls Area */}
                     <div className="flex items-center justify-between p-3 px-4 pt-0">
                         <div
-                            className="px-4 py-2.5 rounded-xl flex items-center gap-1.5 flex-grow max-w-[180px] h-[40px] justify-center overflow-hidden"
+                            className="px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-1.5 flex-grow max-w-[120px] sm:max-w-[180px] h-[40px] justify-center overflow-hidden"
                             style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
                         >
                             {(isConnected || isRecording) ? (
@@ -329,7 +351,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                             <button
                                 onClick={handleToggleConnection}
                                 disabled={isConnecting}
-                                className={`p-2.5 rounded-full transition-all cursor-pointer ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
+                                className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
                             >
                                 <Phone className={`w-5 h-5 ${isConnected || isRecording ? 'rotate-[135deg]' : ''}`} />
                             </button>

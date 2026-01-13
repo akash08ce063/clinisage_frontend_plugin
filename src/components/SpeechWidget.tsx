@@ -11,17 +11,26 @@ const SpeechWidget: React.FC<SpeechWidgetProps> = ({ inline }) => {
     const { position } = useWidget();
 
     const getPositionClasses = () => {
+        // ... (existing logic)
+        // On mobile (< 640px), always center at bottom with full width (16px margins)
+        // On desktop, use the configured position
+        const mobilePosition = 'bottom-4 left-4 right-4 items-center';
+
         switch (position) {
-            case 'top-left': return 'top-6 left-6 items-start';
-            case 'top-right': return 'top-6 right-6 items-end';
-            case 'bottom-left': return 'bottom-6 left-6 items-start';
+            case 'top-left':
+                return `sm:top-6 sm:left-6 sm:right-auto sm:translate-x-0 sm:items-start ${mobilePosition}`;
+            case 'top-right':
+                return `sm:top-6 sm:right-6 sm:left-auto sm:translate-x-0 sm:items-end ${mobilePosition}`;
+            case 'bottom-left':
+                return `sm:bottom-6 sm:left-6 sm:right-auto sm:translate-x-0 sm:items-start ${mobilePosition}`;
             case 'bottom-right':
-            default: return 'bottom-6 right-6 items-end';
+            default:
+                return `sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 sm:items-end ${mobilePosition}`;
         }
     };
 
     return (
-        <div className={`${inline ? 'relative' : `fixed ${getPositionClasses()} z-50`} flex flex-col gap-4 pointer-events-none`}>
+        <div className={`${inline ? 'relative' : `fixed ${getPositionClasses()} z-[9999]`} flex flex-col gap-4 pointer-events-none font-sans text-base`}>
             <AnimatePresence>
                 {/* {isExpanded && (
                     <motion.div
