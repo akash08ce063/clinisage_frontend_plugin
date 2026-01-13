@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Widget Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f0f4f8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Host Site Integration Test</h1>
+    <p>This page simulates a client website embedding the widget.</p>
+
+    <!-- Widget Configuration -->
+    <script>
+        window.clinisageConfig = {
+            agentName: "Embed Test Agent",
+            themeColor: '#0ea5e9',
+            backgroundColor: '#ffffff',
+            textColor: '#000000',
+            position: 'bottom-right',
+            authToken: 'eyJhbGciOiJIUzI1NiIsImtpZCI6ImtNVzFwcXJ2L1d0QVhScmwiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3JmcWlqcGpqdHBnZmNxemlja3d4LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkOTBiMTBhOC0wMzllLTRiOWYtODllMi05NGU0MjM2YWVjMTIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY4MjgxMDE2LCJpYXQiOjE3NjgxOTQ2MTYsImVtYWlsIjoiZGhydW1pbGhlbGljb3JlMjJAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJjb3VudHJ5IjoiSW5kaWEiLCJlbWFpbCI6ImRocnVtaWxoZWxpY29yZTIyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiRGhydW1pbCIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6Ik90aGVyIiwic3ViIjoiZDkwYjEwYTgtMDM5ZS00YjlmLTg5ZTItOTRlNDIzNmFlYzEyIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzY4MTk0NjE2fV0sInNlc3Npb25faWQiOiI4NDQ0YTZiZC1iNjk0LTQyY2QtYmE0OC05MTllYzdjNDZkZjUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.xPaBCE6H0_blPb7v6wRvvFhuHUz7ErL44WB1kuyHeH8',
+            sessionId: '24bd88ce-171c-4d5d-884a-97da47af1123'
+        };
+    </script>
+
+    <!-- Widget Script (pointing to local build) -->
+    <script src="./dist/widget.js" async></script>
+</body>
+
+</html>
