@@ -127,7 +127,7 @@ After deployment, test your widget using the example HTML:
             agentName: "My Assistant",
             themeColor: '#0ea5e9',
             position: 'bottom-right',
-            authToken: 'YOUR_AUTH_TOKEN_HERE'
+            apiKey: 'YOUR_API_KEY_HERE'
         };
     </script>
     

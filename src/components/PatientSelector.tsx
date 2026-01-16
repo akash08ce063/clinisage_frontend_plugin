@@ -14,7 +14,8 @@ const PatientSelector: React.FC = () => {
         themeColor,
         backgroundColor,
         textColor,
-        notify
+        notify,
+        isLinkingPatient
     } = useWidget();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -92,11 +93,15 @@ const PatientSelector: React.FC = () => {
                     color: currentSession?.patient_id ? '#0ea5e9' : textColor,
                 }}
             >
-                <User className="w-3.5 h-3.5 shrink-0" />
+                {isLinkingPatient ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                    <User className="w-3.5 h-3.5 shrink-0" />
+                )}
                 <span className="truncate max-w-[140px]">
-                    {displayName}
+                    {isLinkingPatient ? 'Linking...' : displayName}
                 </span>
-                <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                {!isLinkingPatient && <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />}
             </button>
 
             <AnimatePresence>

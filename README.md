@@ -10,7 +10,7 @@ A standalone, embeddable speech-to-text widget for medical note-taking. This wid
 - 👥 **Patient Management**: Link sessions to patient records
 - 💾 **Session History**: Access and manage previous conversations
 - 🎨 **Customizable**: Configure colors, position, and branding
-- 🔒 **Secure**: Token-based authentication with encrypted communications
+- 🔒 **Secure**: API Key authentication with encrypted communications
 
 ## Quick Start
 
@@ -61,7 +61,7 @@ For clients who want to embed the widget on their website:
 <!-- Widget Configuration -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         agentName: 'Medical Assistant',
         themeColor: '#0ea5e9',
         position: 'bottom-right'
@@ -78,7 +78,7 @@ See [CLIENT_INTEGRATION.md](./CLIENT_INTEGRATION.md) for complete integration gu
 
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
-| `authToken` | string | ✅ Yes | - | Authentication token |
+| `apiKey` | string | ✅ Yes | - | Your API Key |
 | `agentName` | string | No | `'Voice Assistant'` | Display name |
 | `themeColor` | string | No | `'#0ea5e9'` | Primary color (hex) |
 | `backgroundColor` | string | No | `'#ffffff'` | Background color |
@@ -151,7 +151,7 @@ export default defineConfig({
 ## Security
 
 - All API communications use HTTPS
-- Token-based authentication
+- API Key authentication
 - Sessions are isolated per user/browser
 - No sensitive data stored in localStorage
 

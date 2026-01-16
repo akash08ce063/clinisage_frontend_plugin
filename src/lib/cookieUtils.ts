@@ -38,33 +38,21 @@ export class CookieUtils {
         });
     }
 
-    static setAuthToken(token: string): void {
-        this.setCookie(COOKIE_NAMES.AUTH_TOKEN, token, 7); // 7 days
-        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+
+    static setApiKey(apiKey: string): void {
+        this.setCookie(COOKIE_NAMES.API_KEY, apiKey, 30); // 30 days
+        localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
     }
 
-    static getAuthToken(): string | null {
-        return this.getCookie(COOKIE_NAMES.AUTH_TOKEN) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    static getApiKey(): string | null {
+        return this.getCookie(COOKIE_NAMES.API_KEY) || localStorage.getItem(STORAGE_KEYS.API_KEY);
     }
 
-    static removeAuthToken(): void {
-        this.deleteCookie(COOKIE_NAMES.AUTH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    static removeApiKey(): void {
+        this.deleteCookie(COOKIE_NAMES.API_KEY);
+        localStorage.removeItem(STORAGE_KEYS.API_KEY);
     }
 
-    static setRefreshToken(token: string): void {
-        this.setCookie(COOKIE_NAMES.REFRESH_TOKEN, token, 30); // 30 days
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
-    }
-
-    static getRefreshToken(): string | null {
-        return this.getCookie(COOKIE_NAMES.REFRESH_TOKEN) || localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-    }
-
-    static removeRefreshToken(): void {
-        this.deleteCookie(COOKIE_NAMES.REFRESH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    }
 
     static setUserData(userData: any): void {
         this.setCookie(COOKIE_NAMES.USER_DATA, JSON.stringify(userData), 7);
@@ -100,18 +88,8 @@ export class CookieUtils {
     }
 
     static clearAllAuthData(): void {
-        this.removeAuthToken();
+        this.removeApiKey();
         this.removeUserData();
-        this.removeRefreshToken();
     }
 
-    static isTokenExpired(token: string): boolean {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Date.now() / 1000;
-            return payload.exp < currentTime;
-        } catch {
-            return true; // If we can't decode, assume expired
-        }
-    }
 } 

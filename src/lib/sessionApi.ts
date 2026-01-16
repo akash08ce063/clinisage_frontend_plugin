@@ -24,11 +24,11 @@ class SessionApi {
     private baseUrl = `${API_BASE_URL}/sessions/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const token = CookieUtils.getAuthToken();
-        if (!token) return { 'Content-Type': 'application/json' };
+        const key = CookieUtils.getApiKey();
+        if (!key) return { 'Content-Type': 'application/json' };
         return {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'x-api-key': key,
             "ngrok-skip-browser-warning": "true",
         };
     }
@@ -92,7 +92,7 @@ class SessionApi {
     async deleteSession(sessionId: string): Promise<void> {
         try {
             const headers = await this.getAuthHeaders();
-            const response = await fetch(`${this.baseUrl}${sessionId}/`, {
+            const response = await fetch(`${this.baseUrl}${sessionId}`, {
                 method: 'DELETE',
                 headers
             });
@@ -106,7 +106,7 @@ class SessionApi {
     async updateSession(sessionId: string, data: UpdateSessionRequest): Promise<Session> {
         try {
             const headers = await this.getAuthHeaders();
-            const response = await fetch(`${this.baseUrl}${sessionId}/`, {
+            const response = await fetch(`${this.baseUrl}${sessionId}`, {
                 method: 'PUT',
                 headers,
                 body: JSON.stringify(data)

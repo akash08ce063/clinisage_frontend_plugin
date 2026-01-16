@@ -13,13 +13,13 @@ class TranscriptApi {
     private baseUrl = `${API_BASE_URL}/transcript/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const token = CookieUtils.getAuthToken();
-        if (!token) {
-            throw new Error('No authentication token found');
+        const key = CookieUtils.getApiKey();
+        if (!key) {
+            throw new Error('No API key found');
         }
         return {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'x-api-key': key,
             "ngrok-skip-browser-warning": "true",
         };
     }

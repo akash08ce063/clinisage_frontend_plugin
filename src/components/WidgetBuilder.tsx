@@ -19,18 +19,18 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
 
     const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
     const {
-        authToken, setAuthTokenState,
+        apiKey, setApiKey,
     } = useWidget();
 
-    const [localToken, setLocalToken] = useState(authToken || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmE0MTBhLWY5NjEtNDMxOC1hNTA1LTcwMzQ1YjkzYTNmYiIsImVtYWlsIjoiaGFzaEBtYWlsLmNvIiwicm9sZSI6InByYWN0aXRpb25lciIsImV4cCI6MTczODk5NzUxMn0.N612gN5wclC833-D37q-DqId1Y2J88_w8X3yJ8_8X3o');
+    const [localKey, setLocalKey] = useState(apiKey || '');
 
-    // Debounce Token update
+    // Debounce API Key update
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (localToken) setAuthTokenState(localToken);
+            if (localKey) setApiKey(localKey);
         }, 800);
         return () => clearTimeout(timer);
-    }, [localToken, setAuthTokenState]);
+    }, [localKey, setApiKey]);
 
     const snippet = `
 <!--Clinisage Widget Snippet-->
@@ -41,7 +41,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
     backgroundColor: "${backgroundColor}",
     textColor: "${textColor}",
     position: "${position}",
-    authToken: "${localToken}",
+    apiKey: "${localKey}",
   };
 </script>
 <script src="https://adorable-donut-d43d78.netlify.app/widget.js" async></script>
@@ -71,10 +71,10 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                 </div>
             </header>
 
-            <main className="flex-1 w-full p-6 flex flex-col lg:flex-row gap-6">
+            <main className="flex-1 w-full p-4 sm:p-6 flex flex-col lg:flex-row gap-6 overflow-y-auto">
                 {/* Left Panel: Customize Widget */}
                 <aside className="w-full lg:w-[400px] shrink-0">
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden sticky top-8">
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden lg:sticky lg:top-8">
                         <div className="p-6 border-b border-slate-100 flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
                                 <Settings className="w-4 h-4 text-slate-600" />
@@ -93,7 +93,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                     type="text"
                                     value={agentName}
                                     onChange={(e) => setAgentName(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                                     placeholder="Enter widget name..."
                                 />
                             </div>
@@ -122,7 +122,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                             key={pos}
                                             onClick={() => setPosition(pos)}
                                             className={`px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${position === pos
-                                                ? 'bg-sky-500 border-sky-600 text-white shadow-sm'
+                                                ? 'bg-teal-600 border-teal-700 text-white shadow-sm'
                                                 : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                                                 }`}
                                         >
@@ -140,17 +140,17 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                 </div>
                                 <div className="space-y-3">
                                     <div className="space-y-1">
-                                        <label className="text-[10px] font-semibold text-slate-500 uppercase">Auth Token</label>
+                                        <label className="text-[10px] font-semibold text-slate-500 uppercase">API Key</label>
                                         <input
                                             type="text"
-                                            value={localToken}
-                                            onChange={(e) => setLocalToken(e.target.value)}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-sky-500 transition-all"
-                                            placeholder="Paste JWT token here..."
+                                            value={localKey}
+                                            onChange={(e) => setLocalKey(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-teal-500 transition-all"
+                                            placeholder="Paste API key here..."
                                         />
                                     </div>
                                     <p className="text-[9px] text-slate-400 leading-tight">
-                                        Note: Providing these allows real note generation and history fetching in this builder preview.
+                                        Note: Providing your API key allows real-time transcription and note generation in this builder preview.
                                     </p>
                                 </div>
                             </div>
@@ -159,7 +159,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                 </aside>
 
                 {/* Right Panel: Tabs Preview/Code */}
-                <section className="flex-1 min-h-[600px] flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <section className="flex-1 min-h-[500px] lg:min-h-[600px] flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-slate-800">
                     <div className="flex border-b border-slate-200">
                         <Tab
                             item="preview"
@@ -205,7 +205,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                     className="w-full max-w-2xl"
                                 >
                                     <div className="relative group">
-                                        <pre className="bg-slate-900 rounded-xl p-8 text-[13px] leading-relaxed overflow-x-auto font-mono text-sky-300 shadow-xl border border-slate-800">
+                                        <pre className="bg-slate-900 rounded-xl p-8 text-[13px] leading-relaxed overflow-x-auto font-mono text-teal-300 shadow-xl border border-slate-800">
                                             <code>{snippet}</code>
                                         </pre>
                                         <button
@@ -244,7 +244,7 @@ const ColorInput = ({ label, value, onChange }: { label: string, value: string, 
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-20 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-[11px] font-mono focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-20 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-[11px] font-mono focus:outline-none focus:ring-1 focus:ring-teal-500"
             />
         </div>
     </div>
@@ -253,7 +253,7 @@ const ColorInput = ({ label, value, onChange }: { label: string, value: string, 
 const Tab = ({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, item: string }) => (
     <button
         onClick={onClick}
-        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all relative ${active ? 'text-sky-600' : 'text-slate-400 hover:text-slate-600'
+        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all relative ${active ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
             }`}
     >
         {icon}
@@ -261,7 +261,7 @@ const Tab = ({ active, onClick, icon, label }: { active: boolean, onClick: () =>
         {active && (
             <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-sky-500 shadow-[0_-4px_12px_rgba(14,165,233,0.3)]"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-600 shadow-[0_-4px_12px_rgba(13,148,136,0.3)]"
             />
         )}
     </button>

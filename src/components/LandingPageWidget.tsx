@@ -122,7 +122,7 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
             <motion.div
                 animate={{
                     height: isExpanded ? 480 : 76,
-                    width: 400,
+                    width: isExpanded ? 'min(400px, 92vw)' : 'min(400px, 92vw)',
                     borderRadius: isExpanded ? 24 : 16
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}

@@ -167,9 +167,9 @@ class AudioStreamingServiceImpl implements AudioStreamingService {
         this.clearDisconnectTimeout();
 
 
-        const token = CookieUtils.getAuthToken();
-        if (!token) {
-            throw new Error('No authentication token found');
+        const key = CookieUtils.getApiKey();
+        if (!key) {
+            throw new Error('No API key found');
         }
 
         if (!this.audioContext) {
@@ -201,7 +201,7 @@ class AudioStreamingServiceImpl implements AudioStreamingService {
         this.playerNode = new AudioWorkletNode(this.audioContext, 'linear16-player');
         this.playerNode.connect(this.audioContext.destination);
 
-        const wsUrl = getWebSocketUrl(BACKEND_URL, `/api/call/web-media-stream?session_id=${encodeURIComponent(sessionId)}&token=${encodeURIComponent(token)}&language=${encodeURIComponent(language)}`);
+        const wsUrl = getWebSocketUrl(BACKEND_URL, `/api/call/web-media-stream?session_id=${encodeURIComponent(sessionId)}&api_key=${encodeURIComponent(key)}&language=${encodeURIComponent(language)}`);
 
         this.websocket = new WebSocket(wsUrl);
         this.websocket.binaryType = 'arraybuffer';

@@ -30,22 +30,22 @@ class TemplateApi {
     private baseUrl = `${API_BASE_URL}/templates/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const token = CookieUtils.getAuthToken();
-        if (!token) {
-            throw new Error('No authentication token found');
+        const key = CookieUtils.getApiKey();
+        if (!key) {
+            throw new Error('No API key found');
         }
         return {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'x-api-key': key,
             "ngrok-skip-browser-warning": "true",
         };
     }
 
     private handleAuthError(response: Response, operation: string): never {
         if (response.status === 401) {
-            // Clear the expired token
-            CookieUtils.removeAuthToken();
-            throw new Error('Authentication failed. Please log in again.');
+            // Clear the invalid API key
+            CookieUtils.removeApiKey();
+            throw new Error('Authentication failed. Please check your API key.');
         }
 
         // For other errors, try to get the error message
@@ -74,7 +74,7 @@ class TemplateApi {
     async getTemplate(templateId: string): Promise<Template> {
         try {
             const headers = await this.getAuthHeaders();
-            const response = await fetch(`${this.baseUrl}${templateId}/`, {
+            const response = await fetch(`${this.baseUrl}${templateId}`, {
                 method: 'GET',
                 headers
             });
@@ -93,7 +93,7 @@ class TemplateApi {
     async getTemplatesByType(templateType: string): Promise<Template[]> {
         try {
             const headers = await this.getAuthHeaders();
-            const response = await fetch(`${this.baseUrl}by-type/${templateType}/`, {
+            const response = await fetch(`${this.baseUrl}by-type/${templateType}`, {
                 method: 'GET',
                 headers
             });

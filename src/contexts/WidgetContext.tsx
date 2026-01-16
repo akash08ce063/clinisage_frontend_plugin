@@ -40,7 +40,7 @@ interface WidgetState {
     isLoadingNotes: boolean;
     sessions: Session[];
     isLoadingSessions: boolean;
-    authToken: string | null;
+    apiKey: string | null;
     sessionId: string | null;
     isLoadingTranscript: boolean;
     isSessionSwitching: boolean;
@@ -53,6 +53,7 @@ interface WidgetState {
     notification: { message: string; type: 'info' | 'error' | 'success' } | null;
     isWaitingForMediaStream: boolean;
     isDemoMode: boolean;
+    isLinkingPatient: boolean;
 }
 
 interface WidgetContextType extends WidgetState {
@@ -72,7 +73,7 @@ interface WidgetContextType extends WidgetState {
     setPosition: (position: WidgetPosition) => void;
     setSelectedTemplateId: (id: string | null) => void;
     fetchNoteDetails: (noteId: string) => Promise<void>;
-    setAuthTokenState: (token: string) => void;
+    setApiKey: (key: string) => void;
     setSessionId: (id: string) => void;
     fetchSessions: () => Promise<void>;
     selectSession: (sessionId: string) => Promise<void>;
@@ -89,6 +90,7 @@ interface WidgetContextType extends WidgetState {
     notify: (message: string, type?: 'info' | 'error' | 'success') => void;
     clearNotification: () => void;
     startDemo: (script: string[]) => Promise<void>;
+    isLinkingPatient: boolean;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -101,7 +103,7 @@ export const WidgetProvider: React.FC<{
         backgroundColor?: string;
         textColor?: string;
         position?: WidgetPosition;
-        authToken?: string;
+        apiKey?: string;
     }
 }> = ({ children, initialConfig }) => {
     const [currentSession, setCurrentSession] = useState<Session | null>(null);
@@ -139,21 +141,22 @@ export const WidgetProvider: React.FC<{
     const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
     const [isWaitingForMediaStream, setIsWaitingForMediaStream] = useState(false);
+    const [isLinkingPatient, setIsLinkingPatient] = useState(false);
 
-    const [authToken, setAuthToken] = useState<string | null>(config?.authToken || null);
+    const [apiKey, setApiKeyState] = useState<string | null>(config?.apiKey || null);
     const [sessionId, setSessionIdState] = useState<string | null>(null);
 
-    // Initial setup for authToken from config
+    // Initial setup for apiKey from config
     useEffect(() => {
-        if (config?.authToken) {
-            setAuthToken(config.authToken);
-            CookieUtils.setAuthToken(config.authToken);
+        if (config?.apiKey) {
+            setApiKeyState(config.apiKey);
+            CookieUtils.setApiKey(config.apiKey);
         }
-    }, [config?.authToken]);
+    }, [config?.apiKey]);
 
-    const setAuthTokenState = useCallback((token: string) => {
-        setAuthToken(token);
-        CookieUtils.setAuthToken(token);
+    const setApiKey = useCallback((key: string) => {
+        setApiKeyState(key);
+        CookieUtils.setApiKey(key);
     }, []);
 
     const setSessionId = useCallback((id: string) => {
@@ -170,8 +173,8 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const fetchSessions = useCallback(async () => {
-        const token = authToken || CookieUtils.getAuthToken();
-        if (!token) return;
+        const key = apiKey || CookieUtils.getApiKey();
+        if (!key) return;
 
         try {
             setIsLoadingSessions(true);
@@ -183,7 +186,7 @@ export const WidgetProvider: React.FC<{
         } finally {
             setIsLoadingSessions(false);
         }
-    }, [authToken]);
+    }, [apiKey]);
 
     const fetchTranscript = useCallback(async (id: string) => {
         try {
@@ -352,20 +355,30 @@ export const WidgetProvider: React.FC<{
             notify('Please first select or create a new session', 'error');
             return;
         }
+        const key = apiKey || CookieUtils.getApiKey();
+        if (!key) {
+            notify('Please add API Key first', 'error');
+            return;
+        }
+
         try {
+            setIsLinkingPatient(true);
             const updated = await sessionApi.updateSession(currentSession.id, { patient_id: patientId });
             setCurrentSession(updated);
             setSessions(prev => prev.map(s => s.id === updated.id ? updated : s));
+            notify('Patient linked successfully', 'success');
         } catch (err) {
             console.error('WidgetContext: linkPatient failed:', err);
             setError('Failed to link patient');
             throw err;
+        } finally {
+            setIsLinkingPatient(false);
         }
-    }, [currentSession, notify]);
+    }, [currentSession, notify, apiKey]);
 
-    // Fetch sessions when token is set and auto-select/create
+    // Fetch sessions when key is set and auto-select/create
     useEffect(() => {
-        if (authToken) {
+        if (apiKey) {
             (async () => {
                 try {
                     // Avoid double loading if already loading
@@ -386,13 +399,13 @@ export const WidgetProvider: React.FC<{
                 }
             })();
         }
-    }, [authToken, selectSession, createNewSession]);
+    }, [apiKey, selectSession, createNewSession]);
 
-    // Fetch templates on mount or when token is set
+    // Fetch templates on mount or when key is set
     useEffect(() => {
         const fetchTemplates = async () => {
-            const token = authToken || CookieUtils.getAuthToken();
-            if (!token) return;
+            const key = apiKey || CookieUtils.getApiKey();
+            if (!key) return;
 
             try {
                 const fetchedTemplates = await templateApi.getTemplates();
@@ -408,7 +421,7 @@ export const WidgetProvider: React.FC<{
         };
 
         fetchTemplates();
-    }, [authToken]);
+    }, [apiKey]);
 
     // Listen for transcriptions
     useEffect(() => {
@@ -437,6 +450,12 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const startCall = useCallback(async () => {
+        const key = apiKey || CookieUtils.getApiKey();
+        if (!key) {
+            notify('Please add API Key first', 'error');
+            return;
+        }
+
         try {
             setError(null);
             setIsConnecting(true);
@@ -464,6 +483,12 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const toggleRecording = useCallback(async () => {
+        const key = apiKey || CookieUtils.getApiKey();
+        if (!key) {
+            notify('Please add API Key first', 'error');
+            return;
+        }
+
         if (isRecording) {
             audioStreamingService.stopRecording();
             setIsRecording(false);
@@ -544,6 +569,12 @@ export const WidgetProvider: React.FC<{
     }, [existingNotes]);
 
     const generateNote = useCallback(async (templateId: string) => {
+        const key = apiKey || CookieUtils.getApiKey();
+        if (!key) {
+            notify('Please add API Key first', 'error');
+            return;
+        }
+
         console.log('WidgetContext: generateNote called with:', templateId);
         if (!currentSession) {
             console.warn('WidgetContext: generateNote aborted - no currentSession');
@@ -704,8 +735,8 @@ export const WidgetProvider: React.FC<{
         sessions,
         isLoadingSessions,
         fetchNoteDetails,
-        authToken,
-        setAuthTokenState,
+        apiKey,
+        setApiKey,
         sessionId,
         setSessionId,
         fetchSessions,
@@ -732,7 +763,8 @@ export const WidgetProvider: React.FC<{
         clearNotification,
         isWaitingForMediaStream,
         isDemoMode,
-        startDemo
+        startDemo,
+        isLinkingPatient
     };
 
     return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;

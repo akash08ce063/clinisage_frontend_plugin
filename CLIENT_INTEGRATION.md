@@ -10,7 +10,7 @@ Add these two snippets to your HTML page, just before the closing `</body>` tag:
 <!-- 1. Widget Configuration -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         agentName: 'Medical Assistant',
         themeColor: '#0ea5e9',
         position: 'bottom-right'
@@ -29,7 +29,7 @@ That's it! The widget will appear on your page.
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `authToken` | string | Your authentication token (provided by Clinisage) |
+| `apiKey` | string | Your API Key (provided by Clinisage) |
 
 ### Optional
 
@@ -58,7 +58,7 @@ That's it! The widget will appear on your page.
     <!-- Widget Configuration -->
     <script>
         window.clinisageConfig = {
-            authToken: 'YOUR_AUTH_TOKEN_HERE'
+            apiKey: 'YOUR_API_KEY_HERE'
         };
     </script>
     
@@ -73,7 +73,7 @@ That's it! The widget will appear on your page.
 ```html
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         agentName: 'Dr. Smith Assistant',
         themeColor: '#10b981',        // Green theme
         backgroundColor: '#f9fafb',   // Light gray background
@@ -92,7 +92,7 @@ You can place the widget in different corners:
 <!-- Bottom Right (default) -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         position: 'bottom-right'
     };
 </script>
@@ -100,7 +100,7 @@ You can place the widget in different corners:
 <!-- Bottom Left -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         position: 'bottom-left'
     };
 </script>
@@ -108,7 +108,7 @@ You can place the widget in different corners:
 <!-- Top Right -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         position: 'top-right'
     };
 </script>
@@ -116,7 +116,7 @@ You can place the widget in different corners:
 <!-- Top Left -->
 <script>
     window.clinisageConfig = {
-        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        apiKey: 'YOUR_API_KEY_HERE',
         position: 'top-left'
     };
 </script>
@@ -125,7 +125,7 @@ You can place the widget in different corners:
 ## How It Works
 
 1. **Configuration**: The widget reads settings from `window.clinisageConfig`
-2. **Authentication**: Uses your `authToken` to connect to Clinisage services
+2. **Authentication**: Uses your `apiKey` to connect to Clinisage services
 3. **Session Management**: Automatically creates and manages user sessions
 4. **Recording**: Captures and transcribes voice conversations
 5. **Notes**: Generates medical notes from transcriptions
@@ -142,7 +142,7 @@ You can place the widget in different corners:
 ## Security
 
 - All communications are encrypted (HTTPS)
-- Authentication tokens are required for all operations
+- API Keys are required for all operations
 - Sessions are isolated per user/browser
 - No data is stored in localStorage without encryption
 
@@ -169,7 +169,7 @@ The widget works on all modern browsers:
 3. Verify the user granted microphone permissions
 
 ### Authentication errors
-1. Verify your `authToken` is correct
+1. Verify your `apiKey` is correct
 2. Check that the token hasn't expired
 3. Contact Clinisage support for token issues
 

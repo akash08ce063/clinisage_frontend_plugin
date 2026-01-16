@@ -55,7 +55,7 @@ class ClinisageWidget extends HTMLElement {
                         backgroundColor: config.backgroundColor,
                         textColor: config.textColor,
                         position: config.position,
-                        authToken: config.authToken
+                        apiKey: config.apiKey
                     }}
                 >
                     <SpeechWidget />

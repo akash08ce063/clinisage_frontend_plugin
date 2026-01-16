@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Database, Brain, Clock, Code } from 'lucide-react';
+import { ArrowRight, Database, Brain, Clock, Code, Activity } from 'lucide-react';
 import LandingPageWidget from './LandingPageWidget';
 import MockEHR from './MockEHR';
+import Footer from './Footer';
 
 interface LandingPageProps {
     onLaunchDemo: () => void;
@@ -35,13 +36,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     </div>
                     <span className="text-xl font-bold text-slate-800 tracking-tight">Clinisage</span>
                 </div>
-                <button
-                    onClick={onLaunchDemo}
-                    className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors text-sm"
-                >
-                    <Code className="w-4 h-4" />
-                    Dev Console
-                </button>
+                <div className="flex items-center gap-4">
+                    <a
+                        href="https://clinisage.ai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-teal-700 font-semibold hover:bg-teal-50 transition-colors text-sm"
+                    >
+                        Try our EMR
+                    </a>
+                    <button
+                        onClick={onLaunchDemo}
+                        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors text-sm"
+                    >
+                        <Code className="w-4 h-4" />
+                        Dev Console
+                    </button>
+                </div>
             </nav>
 
             {/* Hero Section */}
@@ -54,7 +65,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     <span className="inline-block px-4 py-1.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold uppercase tracking-widest mb-6 border border-teal-100">
                         Automated Clinical Documentation
                     </span>
-                    <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-5xl mx-auto">
+                    <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-5xl mx-auto px-4">
                         Embeddable <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-sky-600">AI Medical Scribe</span> for Any EHR
                     </h1>
                     <p className="text-lg lg:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
@@ -62,7 +73,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     </p>
 
                     {/* Interactive Tabbed Control */}
-                    <div className="flex items-center justify-center gap-2 p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 mb-8 w-fit mx-auto">
+                    <div className="flex items-center justify-start sm:justify-center gap-2 p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 mb-8 w-full max-w-[90vw] sm:w-fit mx-auto overflow-x-auto scrollbar-hide">
                         {[
                             { id: 1, label: "1. Embed" },
                             { id: 2, label: "2. Capture" },
@@ -73,7 +84,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                                 key={step.id}
                                 onClick={() => setActiveStep(step.id as any)}
                                 className={`
-                                    px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300
+                                    px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap
                                     ${activeStep === step.id
                                         ? 'bg-white text-slate-900 shadow-md ring-1 ring-black/5 scale-105'
                                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
@@ -85,6 +96,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         ))}
                     </div>
                 </motion.div>
+
+
 
                 {/* CTA for Customization */}
                 <div className="flex justify-center mb-8">
@@ -116,12 +129,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         </div>
 
                         {/* Demo Controller & Widget Group */}
-                        <div className="absolute bottom-6 right-6 lg:bottom-12 lg:right-12 z-[100] flex items-end gap-4">
+                        <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-12 lg:right-12 z-[100] flex flex-col sm:flex-row items-center sm:items-end justify-center sm:justify-end gap-3 sm:gap-4">
                             {/* Fast Navigation Controller */}
-                            <div className="flex flex-col gap-2 mb-2">
+                            <div className="flex flex-row sm:flex-col items-center gap-2 mb-0 sm:mb-2 bg-white/80 backdrop-blur-md p-2 rounded-2xl border border-slate-200 sm:bg-transparent sm:border-none sm:p-0">
                                 <button
                                     onClick={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
-                                    className="px-5 py-2.5 bg-slate-900 shadow-2xl text-white rounded-[20px] font-bold text-xs flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 border border-white/10 whitespace-nowrap"
+                                    className="px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-900 shadow-xl text-white rounded-[20px] font-bold text-[10px] sm:text-xs flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 border border-white/10 whitespace-nowrap"
                                 >
                                     {activeStep === 1 && "Start Capture"}
                                     {activeStep === 2 && "Stop & Process"}
@@ -129,8 +142,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                                     {activeStep === 4 && "Try Again"}
                                     <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
-                                <div className="px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 opacity-60 text-center">
-                                    Step {activeStep} of 4
+                                <div className="px-2 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 opacity-60 text-center">
+                                    Step {activeStep}/4
                                 </div>
                             </div>
 
@@ -171,7 +184,45 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         description="Reduces clinical documentation time by up to 40% per patient."
                     />
                 </motion.div>
+
+                {/* EMR Info Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="mt-20 w-full max-w-5xl mx-auto p-8 rounded-3xl bg-gradient-to-br from-teal-600 to-sky-700 text-white relative overflow-hidden shadow-2xl group"
+                >
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/20 transition-colors duration-700" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-400/20 rounded-full -ml-10 -mb-10 blur-2xl" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-left">
+                        <div className="flex-1">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider mb-4">
+                                <Activity className="w-3.5 h-3.5" />
+                                Clinisage EMR
+                            </div>
+                            <h2 className="text-3xl font-bold mb-4 tracking-tight">Need a full EMR solution?</h2>
+                            <p className="text-teal-50/80 text-lg leading-relaxed max-w-xl">
+                                Experience <strong>Clinisage EMR</strong> — our complete, AI-first clinical platform designed for maximum productivity. Integrated scribing, smart patient records, and automated charting in one place.
+                            </p>
+                        </div>
+                        <div className="shrink-0">
+                            <a
+                                href="https://clinisage.ai"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-teal-700 font-bold hover:bg-teal-50 transition-all hover:shadow-xl hover:-translate-y-1 active:scale-95 group/btn shadow-lg"
+                            >
+                                Visit Clinisage.ai
+                                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                            </a>
+                        </div>
+                    </div>
+                </motion.div>
             </main>
+
+            <Footer onLaunchDemo={onLaunchDemo} />
         </div>
     );
 };

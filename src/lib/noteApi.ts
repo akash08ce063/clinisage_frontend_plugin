@@ -20,21 +20,21 @@ class NoteApi {
     private baseUrl = `${API_BASE_URL}/notes/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const token = CookieUtils.getAuthToken();
-        if (!token) {
-            throw new Error('No authentication token found');
+        const key = CookieUtils.getApiKey();
+        if (!key) {
+            throw new Error('No API key found');
         }
         return {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'x-api-key': key,
             "ngrok-skip-browser-warning": "true",
         };
     }
 
     private handleAuthError(response: Response, operation: string): never {
         if (response.status === 401) {
-            CookieUtils.removeAuthToken();
-            throw new Error('Authentication failed. Please log in again.');
+            CookieUtils.removeApiKey();
+            throw new Error('Authentication failed. Please check your API key.');
         }
         throw new Error(`Failed to ${operation}: ${response.statusText}`);
     }

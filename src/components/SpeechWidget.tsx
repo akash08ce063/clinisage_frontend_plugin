@@ -11,21 +11,20 @@ const SpeechWidget: React.FC<SpeechWidgetProps> = ({ inline }) => {
     const { position } = useWidget();
 
     const getPositionClasses = () => {
-        // ... (existing logic)
         // On mobile (< 640px), always center at bottom with full width (16px margins)
         // On desktop, use the configured position
-        const mobilePosition = 'bottom-4 left-4 right-4 items-center';
+        const mobilePosition = 'bottom-0 left-0 right-0 items-center p-4 sm:p-0';
 
         switch (position) {
             case 'top-left':
-                return `sm:top-6 sm:left-6 sm:right-auto sm:translate-x-0 sm:items-start ${mobilePosition}`;
+                return `sm:top-6 sm:left-6 sm:right-auto sm:items-start ${mobilePosition}`;
             case 'top-right':
-                return `sm:top-6 sm:right-6 sm:left-auto sm:translate-x-0 sm:items-end ${mobilePosition}`;
+                return `sm:top-6 sm:right-6 sm:left-auto sm:items-end ${mobilePosition}`;
             case 'bottom-left':
-                return `sm:bottom-6 sm:left-6 sm:right-auto sm:translate-x-0 sm:items-start ${mobilePosition}`;
+                return `sm:bottom-6 sm:left-6 sm:right-auto sm:items-start ${mobilePosition}`;
             case 'bottom-right':
             default:
-                return `sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 sm:items-end ${mobilePosition}`;
+                return `sm:bottom-6 sm:right-6 sm:left-auto sm:items-end ${mobilePosition}`;
         }
     };
 

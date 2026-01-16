@@ -19,11 +19,11 @@ class PatientApi {
     private baseUrl = `${API_BASE_URL}/patients/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const token = CookieUtils.getAuthToken();
-        if (!token) return { 'Content-Type': 'application/json' };
+        const key = CookieUtils.getApiKey();
+        if (!key) return { 'Content-Type': 'application/json' };
         return {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'x-api-key': key,
             "ngrok-skip-browser-warning": "true",
         };
     }

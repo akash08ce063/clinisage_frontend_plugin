@@ -107,7 +107,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
             {!isExpanded ? (
                 /* Collapsed State: Pill Bar */
                 <div
-                    className="rounded-2xl border shadow-2xl p-2 flex items-center gap-3 sm:gap-6 w-full sm:w-auto sm:min-w-[400px]"
+                    className="rounded-2xl border shadow-2xl p-2 flex items-center gap-3 sm:gap-6 w-full sm:w-auto sm:min-w-[420px]"
                     style={{
                         backgroundColor: backgroundColor,
                         borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)'
@@ -173,11 +173,11 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
             ) : (
                 /* Expanded State: Input + Controls */
                 <div
-                    className="rounded-3xl border shadow-2xl w-full sm:w-[400px] flex flex-col overflow-hidden transition-all duration-300"
+                    className="fixed bottom-0 left-0 right-0 sm:relative rounded-t-3xl sm:rounded-3xl border shadow-2xl w-full sm:w-[420px] flex flex-col overflow-hidden transition-all duration-300 z-[10000]"
                     style={{
                         backgroundColor: backgroundColor,
                         borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)',
-                        height: 'min(480px, calc(100vh - 2rem))'
+                        height: 'min(520px, 85vh)'
                     }}
                 >
                     {/* Notification Toast */}
@@ -310,7 +310,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     {/* Bottom Controls Area */}
                     <div className="flex items-center justify-between p-3 px-4 pt-0">
                         <div
-                            className="px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-1.5 flex-grow max-w-[120px] sm:max-w-[180px] h-[40px] justify-center overflow-hidden"
+                            className="px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-1.5 flex-grow max-w-[140px] sm:max-w-[180px] h-[40px] justify-center overflow-hidden"
                             style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
                         >
                             {(isConnected || isRecording) ? (
