@@ -24,8 +24,7 @@ class SessionApi {
     private baseUrl = `${API_BASE_URL}/sessions/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const key = CookieUtils.getApiKey();
-        if (!key) return { 'Content-Type': 'application/json' };
+        const key = CookieUtils.getApiKeyWithDefault();
         return {
             'Content-Type': 'application/json',
             'x-api-key': key,

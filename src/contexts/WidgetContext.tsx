@@ -9,6 +9,7 @@ import { transcriptApi } from '../lib/transcriptApi';
 import { patientApi } from '../lib/patientApi';
 import type { Patient } from '../lib/patientApi';
 import { CookieUtils } from '../lib/cookieUtils';
+import { DEFAULT_TEST_API_KEY } from '../lib/constants';
 
 export type WidgetPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
 
@@ -54,6 +55,7 @@ interface WidgetState {
     isWaitingForMediaStream: boolean;
     isDemoMode: boolean;
     isLinkingPatient: boolean;
+    isUsingDefaultKey: boolean;
 }
 
 interface WidgetContextType extends WidgetState {
@@ -143,20 +145,39 @@ export const WidgetProvider: React.FC<{
     const [isWaitingForMediaStream, setIsWaitingForMediaStream] = useState(false);
     const [isLinkingPatient, setIsLinkingPatient] = useState(false);
 
-    const [apiKey, setApiKeyState] = useState<string | null>(config?.apiKey || null);
+    // Check for API key in config, then cookie, then default
+    const getInitialApiKey = () => {
+        if (config?.apiKey) return config.apiKey;
+        const cookieKey = CookieUtils.getApiKey();
+        if (cookieKey) return cookieKey;
+        return DEFAULT_TEST_API_KEY;
+    };
+
+    const [apiKey, setApiKeyState] = useState<string | null>(getInitialApiKey());
+    const isUsingDefaultKey = apiKey === DEFAULT_TEST_API_KEY;
     const [sessionId, setSessionIdState] = useState<string | null>(null);
 
     // Initial setup for apiKey from config
     useEffect(() => {
-        if (config?.apiKey) {
-            setApiKeyState(config.apiKey);
-            CookieUtils.setApiKey(config.apiKey);
+        const initialKey = getInitialApiKey();
+        if (initialKey) {
+            setApiKeyState(initialKey);
+            // Only set cookie if it's not the default key or if specifically from config
+            if (initialKey !== DEFAULT_TEST_API_KEY || config?.apiKey) {
+                CookieUtils.setApiKey(initialKey);
+            }
         }
     }, [config?.apiKey]);
 
     const setApiKey = useCallback((key: string) => {
-        setApiKeyState(key);
-        CookieUtils.setApiKey(key);
+        const keyToSet = key.trim();
+        setApiKeyState(keyToSet || DEFAULT_TEST_API_KEY);
+
+        if (!keyToSet || keyToSet === DEFAULT_TEST_API_KEY) {
+            CookieUtils.removeApiKey();
+        } else {
+            CookieUtils.setApiKey(keyToSet);
+        }
     }, []);
 
     const setSessionId = useCallback((id: string) => {
@@ -764,7 +785,8 @@ export const WidgetProvider: React.FC<{
         isWaitingForMediaStream,
         isDemoMode,
         startDemo,
-        isLinkingPatient
+        isLinkingPatient,
+        isUsingDefaultKey
     };
 
     return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;

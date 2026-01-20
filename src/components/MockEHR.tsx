@@ -1,14 +1,21 @@
 import React from 'react';
 import { Activity, Calendar, FileText, User, Search, Menu, Pill } from 'lucide-react';
 
-const MockEHR: React.FC<{ noteContent?: string | null, activeStep?: number, onNextStep?: () => void }> = ({ noteContent, activeStep = 1, onNextStep }) => {
+const MockEHR: React.FC<{
+    noteContent?: string | null,
+    activeStep?: number,
+    onNextStep?: () => void,
+    type?: 'EHR' | 'EMR'
+}> = ({ noteContent, activeStep = 1, onNextStep, type = 'EHR' }) => {
     return (
         <div className="w-full h-full bg-slate-50 flex overflow-hidden font-sans text-xs select-none">
             {/* Sidebar */}
             <div className="w-16 lg:w-48 bg-slate-900 flex flex-col items-center lg:items-stretch py-4 text-slate-400 shrink-0">
                 <div className="mb-6 flex justify-center lg:justify-start lg:px-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center text-white font-bold">Y</div>
-                    <span className="hidden lg:block ml-3 font-bold text-slate-100 text-sm mt-1.5 tracking-tight">Your EHR</span>
+                    <div className={`w-8 h-8 ${type === 'EMR' ? 'bg-teal-600' : 'bg-blue-600'} rounded-md flex items-center justify-center text-white font-bold`}>
+                        {type === 'EMR' ? 'M' : 'Y'}
+                    </div>
+                    <span className="hidden lg:block ml-3 font-bold text-slate-100 text-sm mt-1.5 tracking-tight">Your {type}</span>
                 </div>
 
                 <div className="space-y-1 px-2">

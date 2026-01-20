@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Database, Brain, Clock, Code, Activity } from 'lucide-react';
+import { ArrowRight, Database, Brain, Clock, Code } from 'lucide-react';
 import LandingPageWidget from './LandingPageWidget';
 import MockEHR from './MockEHR';
 import Footer from './Footer';
@@ -38,12 +38,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                 </div>
                 <div className="flex items-center gap-4">
                     <a
-                        href="https://clinisage.ai"
+                        href="https://calendly.com/clinisage/30min"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-teal-700 font-semibold hover:bg-teal-50 transition-colors text-sm"
+                        className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors text-sm shadow-sm"
                     >
-                        Try our EMR
+                        Book Demo
                     </a>
                     <button
                         onClick={onLaunchDemo}
@@ -95,6 +95,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                             </button>
                         ))}
                     </div>
+
+                    {/* <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                        <a
+                            href="https://calendly.com/clinisage/30min"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-8 py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all hover:scale-105 shadow-xl shadow-slate-200"
+                        >
+                            Book a Live Demo
+                            <ArrowRight className="w-5 h-5" />
+                        </a>
+                        <button
+                            onClick={onLaunchDemo}
+                            className="flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-slate-900 font-bold border border-slate-200 hover:bg-slate-50 transition-all"
+                        >
+                            Try Interactive Demo
+                        </button>
+                    </div> */}
                 </motion.div>
 
 
@@ -130,22 +148,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
 
                         {/* Demo Controller & Widget Group */}
                         <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-12 lg:right-12 z-[100] flex flex-col sm:flex-row items-center sm:items-end justify-center sm:justify-end gap-3 sm:gap-4">
-                            {/* Fast Navigation Controller */}
-                            <div className="flex flex-row sm:flex-col items-center gap-2 mb-0 sm:mb-2 bg-white/80 backdrop-blur-md p-2 rounded-2xl border border-slate-200 sm:bg-transparent sm:border-none sm:p-0">
-                                <button
-                                    onClick={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
-                                    className="px-4 sm:px-5 py-2 sm:py-2.5 bg-slate-900 shadow-xl text-white rounded-[20px] font-bold text-[10px] sm:text-xs flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 border border-white/10 whitespace-nowrap"
-                                >
-                                    {activeStep === 1 && "Start Capture"}
-                                    {activeStep === 2 && "Stop & Process"}
-                                    {activeStep === 3 && "View results"}
-                                    {activeStep === 4 && "Try Again"}
-                                    <ArrowRight className="w-3.5 h-3.5" />
-                                </button>
-                                <div className="px-2 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 opacity-60 text-center">
-                                    Step {activeStep}/4
-                                </div>
-                            </div>
+
 
                             <LandingPageWidget
                                 activeStep={activeStep}
@@ -185,41 +188,39 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     />
                 </motion.div>
 
-                {/* EMR Info Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="mt-20 w-full max-w-5xl mx-auto p-8 rounded-3xl bg-gradient-to-br from-teal-600 to-sky-700 text-white relative overflow-hidden shadow-2xl group"
+                {/* EMR Management Section */}
+                {/* <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="mt-32 w-full max-w-6xl mx-auto"
                 >
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/20 transition-colors duration-700" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-400/20 rounded-full -ml-10 -mb-10 blur-2xl" />
+                    <div className="text-center mb-12">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-widest mb-4 border border-sky-100">
+                            Clinical Documentation Manage Portal
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+                            Manage AI Scribe Notes
+                        </h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-lg">
+                            A dedicated environment for clinicians to review, edit, and approve AI-generated documentation directly within the EMR workflow.
+                        </p>
+                    </div>
 
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-left">
-                        <div className="flex-1">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider mb-4">
-                                <Activity className="w-3.5 h-3.5" />
-                                Clinisage EMR
-                            </div>
-                            <h2 className="text-3xl font-bold mb-4 tracking-tight">Need a full EMR solution?</h2>
-                            <p className="text-teal-50/80 text-lg leading-relaxed max-w-xl">
-                                Experience <strong>Clinisage EMR</strong> — our complete, AI-first clinical platform designed for maximum productivity. Integrated scribing, smart patient records, and automated charting in one place.
-                            </p>
-                        </div>
-                        <div className="shrink-0">
-                            <a
-                                href="https://clinisage.ai"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-teal-700 font-bold hover:bg-teal-50 transition-all hover:shadow-xl hover:-translate-y-1 active:scale-95 group/btn shadow-lg"
-                            >
-                                Visit Clinisage.ai
-                                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                            </a>
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
+                        <MockEHR
+                            type="EMR"
+                            noteContent={demoNote}
+                            activeStep={3} // Show it in completed state
+                        />
+
+                        <div className="absolute top-4 right-4 bg-teal-600 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-lg animate-pulse">
+                            EMR LIVE VIEW
                         </div>
                     </div>
-                </motion.div>
+                </motion.div> */}
+
             </main>
 
             <Footer onLaunchDemo={onLaunchDemo} />

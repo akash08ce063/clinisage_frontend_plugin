@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Code, Palette, Copy, Eye, ArrowLeft } from 'lucide-react';
+import { Settings, Code, Palette, Copy, Eye, ArrowLeft, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useWidget } from '../contexts/WidgetContext';
 import SpeechWidget from './SpeechWidget';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sessionApi } from '../lib/sessionApi';
+import { DEFAULT_TEST_API_KEY } from '../lib/constants';
 
 interface WidgetBuilderProps {
     onBack?: () => void;
@@ -15,6 +17,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
         textColor, setTextColor,
         agentName, setAgentName,
         position, setPosition,
+        isUsingDefaultKey,
     } = useWidget();
 
     const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
@@ -23,14 +26,61 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
     } = useWidget();
 
     const [localKey, setLocalKey] = useState(apiKey || '');
+    const [showDemoModal, setShowDemoModal] = useState(false);
+    const [isValidating, setIsValidating] = useState(false);
+    const [validationError, setValidationError] = useState<string | null>(null);
+    const [isValidKey, setIsValidKey] = useState(false);
 
-    // Debounce API Key update
+    // Validate API key
+    const validateApiKey = async (key: string) => {
+        if (!key || key === DEFAULT_TEST_API_KEY) {
+            setValidationError(null);
+            setIsValidKey(false);
+            return;
+        }
+
+        setIsValidating(true);
+        setValidationError(null);
+
+        try {
+            // Test the API key by making a lightweight call
+            // Temporarily override the cookie to test the new key
+            const { CookieUtils } = await import('../lib/cookieUtils');
+            const previousKey = CookieUtils.getApiKey();
+            CookieUtils.setApiKey(key);
+
+            await sessionApi.getSessions();
+
+            setIsValidKey(true);
+            setValidationError(null);
+
+            // Restore previous key if it was different
+            if (previousKey && previousKey !== key) {
+                CookieUtils.setApiKey(previousKey);
+            }
+        } catch (error) {
+            setIsValidKey(false);
+            setValidationError('Invalid API key. Please check and try again.');
+        } finally {
+            setIsValidating(false);
+        }
+    };
+
+    // Debounce API Key update and validation
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (localKey) setApiKey(localKey);
-        }, 800);
+            setApiKey(localKey);
+            if (localKey && localKey !== DEFAULT_TEST_API_KEY) {
+                validateApiKey(localKey);
+            } else {
+                setValidationError(null);
+                setIsValidKey(false);
+            }
+        }, 1000);
         return () => clearTimeout(timer);
-    }, [localKey, setApiKey]);
+    }, [localKey]);
+
+    const displayKey = isUsingDefaultKey ? 'your_api_key_here' : localKey;
 
     const snippet = `
 <!--Clinisage Widget Snippet-->
@@ -41,33 +91,96 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
     backgroundColor: "${backgroundColor}",
     textColor: "${textColor}",
     position: "${position}",
-    apiKey: "${localKey}",
+    apiKey: "${displayKey}",
   };
 </script>
 <script src="https://adorable-donut-d43d78.netlify.app/widget.js" async></script>
 `.trim();
 
     const copySnippet = () => {
+        if (isUsingDefaultKey) {
+            setShowDemoModal(true);
+            return;
+        }
         navigator.clipboard.writeText(snippet);
     };
 
     return (
         <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
+            {/* Demo Modal */}
+            <AnimatePresence>
+                {showDemoModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-500 to-sky-500" />
+                            <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <Code className="w-8 h-8 text-teal-600" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-2">Get Your Production Key</h3>
+                            <p className="text-slate-500 mb-8 leading-relaxed">
+                                To use this widget on your own website, you'll need a unique production API key. Book a quick 15-min demo with our team to get started.
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <a
+                                    href="https://calendly.com/clinisage/30min"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+                                >
+                                    Book Demo on Calendly
+                                </a>
+                                <button
+                                    onClick={() => setShowDemoModal(false)}
+                                    className="w-full py-4 text-slate-400 font-semibold hover:text-slate-600 transition-colors"
+                                >
+                                    Maybe later
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Header */}
             <header className="bg-white border-b border-slate-200 px-6 py-4">
-                <div className="w-full flex items-center gap-4">
-                    {onBack && (
-                        <button
-                            onClick={onBack}
-                            className="p-2 rounded-full hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-800"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                    )}
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-800">Voice Widget Builder</h1>
-                        <p className="text-slate-500 text-sm mt-1">Create and customize your own conversation bar widget</p>
+                <div className="w-full flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        {onBack && (
+                            <button
+                                onClick={onBack}
+                                className="p-2 rounded-full hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-800"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                        )}
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-800">Voice Widget Builder</h1>
+                            <p className="text-slate-500 text-sm mt-1">Create and customize your own conversation bar widget</p>
+                        </div>
                     </div>
+                    {isUsingDefaultKey && (
+                        <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-teal-50 border border-teal-100 rounded-xl">
+                            <span className="text-xs font-semibold text-teal-700">Ready to go live?</span>
+                            <a
+                                href="https://calendly.com/clinisage/30min"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-bold text-white bg-teal-600 px-3 py-1.5 rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
+                            >
+                                Request Production Key
+                            </a>
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -141,16 +254,47 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                 <div className="space-y-3">
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-semibold text-slate-500 uppercase">API Key</label>
-                                        <input
-                                            type="text"
-                                            value={localKey}
-                                            onChange={(e) => setLocalKey(e.target.value)}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-teal-500 transition-all"
-                                            placeholder="Paste API key here..."
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="password"
+                                                value={localKey === DEFAULT_TEST_API_KEY ? '' : localKey}
+                                                onChange={(e) => setLocalKey(e.target.value)}
+                                                className={`w-full bg-slate-50 border rounded-lg px-3 py-2 pr-9 text-[11px] font-mono focus:outline-none transition-all ${validationError
+                                                    ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                                                    : isValidKey
+                                                        ? 'border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
+                                                        : 'border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20'
+                                                    }`}
+                                                placeholder={isUsingDefaultKey ? "Using default test key..." : "Paste your production API key..."}
+                                            />
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                {isValidating ? (
+                                                    <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
+                                                ) : validationError ? (
+                                                    <XCircle className="w-4 h-4 text-red-500" />
+                                                ) : isValidKey ? (
+                                                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        {validationError && (
+                                            <p className="text-[9px] text-red-600 leading-tight flex items-center gap-1">
+                                                <XCircle className="w-3 h-3" />
+                                                {validationError}
+                                            </p>
+                                        )}
+                                        {isValidKey && !validationError && (
+                                            <p className="text-[9px] text-green-600 leading-tight flex items-center gap-1">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Valid API key
+                                            </p>
+                                        )}
                                     </div>
                                     <p className="text-[9px] text-slate-400 leading-tight">
-                                        Note: Providing your API key allows real-time transcription and note generation in this builder preview.
+                                        {isUsingDefaultKey
+                                            ? "You are using the shared test key. To use your own, please paste a production key above."
+                                            : "Providing your production API key allows real-time transcription in this preview."
+                                        }
                                     </p>
                                 </div>
                             </div>
@@ -210,11 +354,27 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                         </pre>
                                         <button
                                             onClick={copySnippet}
-                                            className="absolute top-4 right-4 p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-sm border border-white/10"
+                                            className={`absolute top-4 right-4 p-2.5 rounded-lg transition-all backdrop-blur-sm border 
+                                                ${isUsingDefaultKey
+                                                    ? 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border-orange-500/20'
+                                                    : 'bg-white/10 hover:bg-white/20 text-white border-white/10'}`}
                                         >
                                             <Copy className="w-4 h-4" />
                                         </button>
                                     </div>
+                                    {isUsingDefaultKey && (
+                                        <div className="mt-4 p-4 rounded-xl bg-orange-50 border border-orange-100 flex items-start gap-3">
+                                            <div className="p-2 bg-orange-100 rounded-lg text-orange-600">
+                                                <Settings className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-orange-800 mb-1">Production Key Required</p>
+                                                <p className="text-[11px] text-orange-700 leading-relaxed">
+                                                    You are currently using a test key. To embed this widget on your site, please <a href="https://calendly.com/clinisage/30min" target="_blank" rel="noopener noreferrer" className="underline font-bold">book a demo</a> to receive your production credentials.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>

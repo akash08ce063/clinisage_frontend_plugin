@@ -167,10 +167,7 @@ class AudioStreamingServiceImpl implements AudioStreamingService {
         this.clearDisconnectTimeout();
 
 
-        const key = CookieUtils.getApiKey();
-        if (!key) {
-            throw new Error('No API key found');
-        }
+        const key = CookieUtils.getApiKeyWithDefault();
 
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({

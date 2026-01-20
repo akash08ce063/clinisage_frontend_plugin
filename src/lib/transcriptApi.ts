@@ -13,10 +13,7 @@ class TranscriptApi {
     private baseUrl = `${API_BASE_URL}/transcript/`;
 
     private async getAuthHeaders(): Promise<HeadersInit> {
-        const key = CookieUtils.getApiKey();
-        if (!key) {
-            throw new Error('No API key found');
-        }
+        const key = CookieUtils.getApiKeyWithDefault();
         return {
             'Content-Type': 'application/json',
             'x-api-key': key,

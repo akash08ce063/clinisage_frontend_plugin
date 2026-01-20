@@ -1,4 +1,4 @@
-import { COOKIE_NAMES, STORAGE_KEYS } from './constants';
+import { COOKIE_NAMES, STORAGE_KEYS, DEFAULT_TEST_API_KEY } from './constants';
 
 // Cookie utilities for JWT token management
 export class CookieUtils {
@@ -46,6 +46,10 @@ export class CookieUtils {
 
     static getApiKey(): string | null {
         return this.getCookie(COOKIE_NAMES.API_KEY) || localStorage.getItem(STORAGE_KEYS.API_KEY);
+    }
+
+    static getApiKeyWithDefault(): string {
+        return this.getApiKey() || DEFAULT_TEST_API_KEY;
     }
 
     static removeApiKey(): void {
