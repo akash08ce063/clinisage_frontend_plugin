@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinisage Speech Widget</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .note {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #fbbf24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎤 Clinisage Speech Widget</h1>
+        <p>This is a demo page showing the widget in action. The widget appears in the bottom-right corner (or
+            bottom-center on mobile).</p>
+
+        <div class="note">
+            <strong>⚠️ Note:</strong> You need to configure your <code>authToken</code> in the script below for the
+            widget to work properly.
+        </div>
+
+        <h2>How to Use</h2>
+        <p>To embed this widget on your website, add the following code to your HTML:</p>
+
+        <pre><code>&lt;!-- Widget Configuration --&gt;
+&lt;script&gt;
+    window.clinisageConfig = {
+        authToken: 'YOUR_AUTH_TOKEN_HERE',
+        agentName: 'Medical Assistant',
+        themeColor: '#0ea5e9',
+        position: 'bottom-right'
+    };
+&lt;/script&gt;
+
+&lt;!-- Widget Script --&gt;
+&lt;script src="https://your-site.netlify.app/widget.js" async&gt;&lt;/script&gt;</code></pre>
+
+        <h2>Configuration Options</h2>
+        <ul>
+            <li><code>authToken</code> - Your authentication token (required)</li>
+            <li><code>agentName</code> - Display name for the assistant</li>
+            <li><code>themeColor</code> - Primary color (hex format)</li>
+            <li><code>backgroundColor</code> - Widget background color</li>
+            <li><code>textColor</code> - Text color</li>
+            <li><code>position</code> - Widget position: 'bottom-right', 'bottom-left', 'top-right', 'top-left'</li>
+        </ul>
+
+        <h2>Features</h2>
+        <ul>
+            <li>🎤 Real-time voice recording</li>
+            <li>📝 Live transcription</li>
+            <li>📋 AI-powered note generation</li>
+            <li>👥 Patient management</li>
+            <li>💾 Session history</li>
+            <li>📱 Mobile responsive</li>
+        </ul>
+    </div>
+
+    <!-- Widget Configuration -->
+    <script>
+        window.clinisageConfig = {
+            agentName: "Voice Assistant",
+            themeColor: "#0ea5e9",
+            backgroundColor: "#ffffff",
+            textColor: "#000000",
+            position: "bottom-right",
+            authToken: "YOUR_AUTH_TOKEN_HERE" // Replace with your actual token
+        };
+    </script>
+
+    <!-- Widget Script -->
+    <script src="./widget.js" async></script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Widget Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f0f4f8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Host Site Integration Test</h1>
+    <p>This page simulates a client website embedding the widget.</p>
+
+    <!-- Widget Configuration -->
+    <!-- <script>
+        window.clinisageConfig = {
+            agentName: "Embed Test Agent",
+            themeColor: '#0ea5e9',
+            backgroundColor: '#ffffff',
+            textColor: '#000000',
+            position: 'bottom-right',
+            apiKey: 'YOUR_API_KEY_HERE'
+            // Note: sessionId is NOT included - the widget creates sessions automatically
+        };
+    </script>
+    <script src="./dist/widget.js" async></script> -->
+
+
+    <script>
+        window.clinisageConfig = {
+            agentName: "Voice Assistant",
+            themeColor: "#0ea5e9",
+            backgroundColor: "#ffffff",
+            textColor: "#000000",
+            position: "bottom-right",
+            apiKey: "YOUR_API_KEY_HERE",
+        };
+    </script>
+    <script src="https://adorable-donut-d43d78.netlify.app/widget.js" async></script>
+</body>
+
+</html>
