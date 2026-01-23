@@ -12,7 +12,8 @@ const SessionSelector: React.FC = () => {
         createNewSession,
         deleteSession,
         renameSession,
-        deletingSessionIds
+        deletingSessionIds,
+        themeColor
     } = useWidget();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -66,11 +67,17 @@ const SessionSelector: React.FC = () => {
         <div className="relative w-full text-slate-900" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl hover:border-sky-500/50 hover:bg-white transition-all duration-200 group pointer-events-auto"
+                className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl hover:bg-white transition-all duration-200 group pointer-events-auto"
+                style={{ '--hover-color': themeColor } as any}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${themeColor}80`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; }}
             >
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                    <div className="w-7 h-7 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                    <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: `${themeColor}20` }}
+                    >
+                        <Calendar className="w-3.5 h-3.5" style={{ color: themeColor }} />
                     </div>
                     <div className="text-left overflow-hidden">
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Active Session</p>
@@ -99,7 +106,16 @@ const SessionSelector: React.FC = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search sessions..."
-                                    className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-sky-500 transition-all"
+                                    className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none transition-all"
+                                    style={{ '--ring-color': themeColor } as any}
+                                    onFocus={(e) => {
+                                        e.target.style.borderColor = themeColor;
+                                        e.target.style.boxShadow = `0 0 0 1px ${themeColor}20`;
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.borderColor = '#e2e8f0'; // slate-200
+                                        e.target.style.boxShadow = 'none';
+                                    }}
                                 />
                             </div>
                         </div>
@@ -121,7 +137,8 @@ const SessionSelector: React.FC = () => {
                             {filteredSessions.map((session) => (
                                 <div
                                     key={session.id}
-                                    className={`group relative flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors ${currentSession?.id === session.id ? 'bg-sky-50/50' : ''}`}
+                                    className="group relative flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                                    style={currentSession?.id === session.id ? { backgroundColor: `${themeColor}10` } : {}}
                                 >
                                     <div
                                         onClick={() => {
@@ -130,7 +147,8 @@ const SessionSelector: React.FC = () => {
                                                 setIsOpen(false);
                                             }
                                         }}
-                                        className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer ${currentSession?.id === session.id ? 'bg-sky-100 text-sky-600' : 'bg-slate-100 text-slate-500'}`}
+                                        className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer ${currentSession?.id === session.id ? '' : 'bg-slate-100 text-slate-500'}`}
+                                        style={currentSession?.id === session.id ? { backgroundColor: `${themeColor}20`, color: themeColor } : {}}
                                     >
                                         <Calendar className="w-4 h-4" />
                                     </div>
@@ -151,7 +169,8 @@ const SessionSelector: React.FC = () => {
                                                             setEditingSessionId(null);
                                                         }
                                                     }}
-                                                    className="flex-1 text-sm font-medium bg-white border border-sky-400 rounded px-1.5 py-0.5 outline-none"
+                                                    className="flex-1 text-sm font-medium bg-white border rounded px-1.5 py-0.5 outline-none"
+                                                    style={{ borderColor: `${themeColor}99`, color: themeColor }}
                                                 />
                                                 <button
                                                     onClick={() => {
@@ -178,11 +197,12 @@ const SessionSelector: React.FC = () => {
                                                 className="cursor-pointer"
                                             >
                                                 <div className="flex items-center justify-between gap-2">
-                                                    <p className={`text-sm font-medium truncate ${currentSession?.id === session.id ? 'text-sky-700' : 'text-slate-700'}`}>
+                                                    <p className={`text-sm font-medium truncate ${currentSession?.id === session.id ? '' : 'text-slate-700'}`}
+                                                        style={currentSession?.id === session.id ? { color: themeColor } : {}}>
                                                         {session.name || 'Untitled Session'}
                                                     </p>
                                                     {currentSession?.id === session.id && (
-                                                        <Check className="w-3.5 h-3.5 text-sky-600 flex-shrink-0" />
+                                                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: themeColor }} />
                                                     )}
                                                 </div>
                                                 <p className="text-[11px] text-slate-400">
@@ -201,7 +221,16 @@ const SessionSelector: React.FC = () => {
                                                     setEditingSessionId(session.id);
                                                     setEditName(session.name || '');
                                                 }}
-                                                className="p-1.5 text-slate-400 hover:text-sky-500 hover:bg-sky-50 rounded-lg transition-all cursor-pointer"
+                                                className="p-1.5 text-slate-400 hover:bg-slate-50 rounded-lg transition-all cursor-pointer"
+                                                style={{ '--hover-color': themeColor } as any}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.color = themeColor;
+                                                    e.currentTarget.style.backgroundColor = `${themeColor}10`;
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.color = '#94a3b8';
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
                                                 title="Rename"
                                             >
                                                 <Edit2 className="w-3.5 h-3.5" />
@@ -231,7 +260,18 @@ const SessionSelector: React.FC = () => {
                             <button
                                 onClick={handleCreateNew}
                                 disabled={isLoadingSessions}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-dashed border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:border-sky-500 hover:text-sky-600 hover:bg-sky-50 transition-all disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-dashed border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
+                                style={{ '--hover-color': themeColor } as any}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = themeColor;
+                                    e.currentTarget.style.color = themeColor;
+                                    e.currentTarget.style.backgroundColor = `${themeColor}10`;
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = '#cbd5e1';
+                                    e.currentTarget.style.color = '#475569';
+                                    e.currentTarget.style.backgroundColor = '#ffffff';
+                                }}
                             >
                                 <Plus className="w-4 h-4" />
                                 New Session

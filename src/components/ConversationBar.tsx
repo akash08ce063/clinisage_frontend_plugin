@@ -262,7 +262,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
 
                         {isSessionSwitching ? (
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400 z-20">
-                                <Loader2 className="w-5 h-5 animate-spin text-sky-500" />
+                                <Loader2 className="w-5 h-5 animate-spin" style={{ color: themeColor }} />
                                 <p className="text-[11px] font-bold uppercase tracking-widest">Switching Session...</p>
                             </div>
                         ) : (
@@ -275,7 +275,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                         <div className="flex-1">
                                             {isLoadingTranscript ? (
                                                 <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
-                                                    <Loader2 className="w-5 h-5 animate-spin text-sky-500" />
+                                                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: themeColor }} />
                                                     <p className="text-[11px] font-bold uppercase tracking-widest">Loading...</p>
                                                 </div>
                                             ) : transcript ? (

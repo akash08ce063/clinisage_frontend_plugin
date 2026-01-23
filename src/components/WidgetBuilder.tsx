@@ -128,11 +128,11 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                             </div>
                             <h3 className="text-2xl font-bold text-slate-800 mb-2">Get Your Production Key</h3>
                             <p className="text-slate-500 mb-8 leading-relaxed">
-                                To use this widget on your own website, you'll need a unique production API key. Book a quick 15-min demo with our team to get started.
+                                To use this widget on your own EMR, you'll need a unique production API key. Book a quick 30-min demo with our team to get started.
                             </p>
                             <div className="flex flex-col gap-3">
                                 <a
-                                    href="https://calendly.com/clinisage/30min"
+                                    href="https://calendly.com/contact-firstpeak/30min-1"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
@@ -141,7 +141,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                 </a>
                                 <button
                                     onClick={() => setShowDemoModal(false)}
-                                    className="w-full py-4 text-slate-400 font-semibold hover:text-slate-600 transition-colors"
+                                    className="w-full py-4 text-slate-400 font-semibold hover:text-slate-600 transition-colors cursor-pointer"
                                 >
                                     Maybe later
                                 </button>
@@ -158,13 +158,13 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                         {onBack && (
                             <button
                                 onClick={onBack}
-                                className="p-2 rounded-full hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-800"
+                                className="p-2 rounded-full hover:bg-slate-100 transition-all text-slate-500 hover:text-slate-800 cursor-pointer"
                             >
                                 <ArrowLeft className="w-5 h-5" />
                             </button>
                         )}
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-800">Voice Widget Builder</h1>
+                            <h1 className="text-2xl font-bold text-slate-800">Clinisage Plugin Builder</h1>
                             <p className="text-slate-500 text-sm mt-1">Create and customize your own conversation bar widget</p>
                         </div>
                     </div>
@@ -172,7 +172,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                         <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-teal-50 border border-teal-100 rounded-xl">
                             <span className="text-xs font-semibold text-teal-700">Ready to go live?</span>
                             <a
-                                href="https://calendly.com/clinisage/30min"
+                                href="https://calendly.com/contact-firstpeak/30min-1"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-xs font-bold text-white bg-teal-600 px-3 py-1.5 rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
@@ -193,7 +193,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                 <Settings className="w-4 h-4 text-slate-600" />
                             </div>
                             <div>
-                                <h2 className="font-semibold text-slate-800">Customize Widget</h2>
+                                <h2 className="font-semibold text-slate-800">Customize Plugin</h2>
                                 <p className="text-xs text-slate-400">Configure your voice widget appearance and behavior</p>
                             </div>
                         </div>
@@ -234,7 +234,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                         <button
                                             key={pos}
                                             onClick={() => setPosition(pos)}
-                                            className={`px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${position === pos
+                                            className={`px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all cursor-pointer ${position === pos
                                                 ? 'bg-teal-600 border-teal-700 text-white shadow-sm'
                                                 : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                                                 }`}
@@ -349,12 +349,12 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                     className="w-full max-w-2xl"
                                 >
                                     <div className="relative group">
-                                        <pre className="bg-slate-900 rounded-xl p-8 text-[13px] leading-relaxed overflow-x-auto font-mono text-teal-300 shadow-xl border border-slate-800">
+                                        <pre className="bg-slate-900 rounded-xl p-8 text-[13px] leading-relaxed overflow-x-auto font-mono text-teal-300 shadow-xl border border-slate-800 select-none">
                                             <code>{snippet}</code>
                                         </pre>
                                         <button
                                             onClick={copySnippet}
-                                            className={`absolute top-4 right-4 p-2.5 rounded-lg transition-all backdrop-blur-sm border 
+                                            className={`absolute top-4 right-4 p-2.5 rounded-lg transition-all backdrop-blur-sm border cursor-pointer 
                                                 ${isUsingDefaultKey
                                                     ? 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border-orange-500/20'
                                                     : 'bg-white/10 hover:bg-white/20 text-white border-white/10'}`}
@@ -370,7 +370,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                             <div>
                                                 <p className="text-xs font-bold text-orange-800 mb-1">Production Key Required</p>
                                                 <p className="text-[11px] text-orange-700 leading-relaxed">
-                                                    You are currently using a test key. To embed this widget on your site, please <a href="https://calendly.com/clinisage/30min" target="_blank" rel="noopener noreferrer" className="underline font-bold">book a demo</a> to receive your production credentials.
+                                                    You are currently using a test key. To embed this widget on your EMR, please <a href="https://calendly.com/contact-firstpeak/30min-1" target="_blank" rel="noopener noreferrer" className="underline font-bold">book a demo</a> to receive your production credentials.
                                                 </p>
                                             </div>
                                         </div>
@@ -413,7 +413,7 @@ const ColorInput = ({ label, value, onChange }: { label: string, value: string, 
 const Tab = ({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, item: string }) => (
     <button
         onClick={onClick}
-        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all relative ${active ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+        className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all relative cursor-pointer ${active ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
             }`}
     >
         {icon}

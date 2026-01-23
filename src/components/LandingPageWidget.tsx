@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Phone, ChevronDown, MessageSquare, FileText, Loader2, Keyboard, Calendar, User } from 'lucide-react';
+import { Mic, MicOff, Phone, ChevronDown, MessageSquare, FileText, Calendar, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface LandingPageWidgetProps {
@@ -58,9 +58,6 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
             typingTimeoutRef.current = setTimeout(typeLetter, 600);
 
         } else if (activeStep === 3) {
-            setIsExpanded(false);
-            setDisplayedTranscript(transcript);
-        } else if (activeStep === 4) {
             setIsExpanded(true);
             setActiveTab('notes');
             setDisplayedTranscript(transcript);
@@ -160,7 +157,7 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
                             <div className="flex items-center gap-1 p-1 px-3 border-b" style={{ borderColor: 'rgba(0,0,0,0.04)' }}>
                                 <button
                                     onClick={() => setActiveTab('transcript')}
-                                    className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all"
+                                    className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
                                     style={{
                                         backgroundColor: activeTab === 'transcript' ? 'rgba(0,0,0,0.05)' : 'transparent',
                                         color: activeTab === 'transcript' ? textColor : 'rgba(0,0,0,0.4)'
@@ -171,7 +168,7 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('notes')}
-                                    className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all"
+                                    className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
                                     style={{
                                         backgroundColor: activeTab === 'notes' ? 'rgba(0,0,0,0.05)' : 'transparent',
                                         color: activeTab === 'notes' ? textColor : 'rgba(0,0,0,0.4)'
@@ -216,9 +213,9 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
                                             className="absolute inset-0 bg-white"
                                         >
                                             <div className="p-4 h-full overflow-y-auto custom-scrollbar flex flex-col">
-                                                {activeStep === 4 ? (
+                                                {activeStep === 3 ? (
                                                     <div
-                                                        className="prose prose-sm max-w-none prose-p:text-slate-600 prose-headings:text-slate-900 prose-strong:text-teal-700 font-sans"
+                                                        className="prose prose-sm max-w-none prose-p:text-slate-600 prose-headings:text-slate-900 prose-strong:text-teal-700 font-sans text-left"
                                                         style={{ fontSize: '14px', lineHeight: '1.6' }}
                                                         dangerouslySetInnerHTML={{ __html: notes }}
                                                     />
@@ -291,18 +288,17 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
                                 <VoiceAssistantBadge />
                             </div>
 
-                            <div className="flex-1 flex items-center justify-center">
-                                {activeStep === 3 ? (
-                                    <div className="flex items-center gap-2">
-                                        <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-                                        <span className="text-[12px] font-bold text-slate-600 tracking-tight">Processing...</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-8">
-                                        <Mic className="w-5 h-5 text-slate-200" />
-                                        <Keyboard className="w-5 h-5 text-slate-200" />
-                                    </div>
-                                )}
+                            <div className="flex-1 flex items-center justify-end gap-2 pr-2">
+                                <IconButton
+                                    icon={<MicOff className="w-5 h-5 opacity-40 text-slate-300" />}
+                                    onClick={() => { }}
+                                    className="hover:bg-slate-50"
+                                />
+                                <IconButton
+                                    icon={<ChevronDown className="w-5 h-5 text-slate-300" />}
+                                    onClick={() => setIsExpanded(true)}
+                                    className="hover:bg-slate-50"
+                                />
                             </div>
 
                             <div className="flex items-center gap-3 pr-2">

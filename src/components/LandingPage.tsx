@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Database, Brain, Clock, Code } from 'lucide-react';
 import LandingPageWidget from './LandingPageWidget';
-import MockEHR from './MockEHR';
+import MockEMR from './MockEMR';
 import Footer from './Footer';
 
 interface LandingPageProps {
@@ -38,7 +38,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                 </div>
                 <div className="flex items-center gap-4">
                     <a
-                        href="https://calendly.com/clinisage/30min"
+                        href="https://calendly.com/contact-firstpeak/30min-1"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors text-sm shadow-sm"
@@ -47,7 +47,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     </a>
                     <button
                         onClick={onLaunchDemo}
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors text-sm"
+                        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors text-sm cursor-pointer"
                     >
                         <Code className="w-4 h-4" />
                         Dev Console
@@ -66,25 +66,34 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         Automated Clinical Documentation
                     </span>
                     <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-5xl mx-auto px-4">
-                        Embeddable <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-sky-600">AI Medical Scribe</span> for Any EHR
+                        Embeddable <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-sky-600">AI Medical Scribe</span> for Any EMR
                     </h1>
                     <p className="text-lg lg:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
-                        Integrate a secure AI medical scribe plugin into your EHR to record visits, transcribe conversations, and create structured clinical notes for review.
+                        Integrate a secure AI medical scribe plugin into your EMR to record visits, transcribe conversations, and create structured clinical notes for review.
                     </p>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                        <button
+                            onClick={onLaunchDemo}
+                            className="flex items-center gap-2 px-8 py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all hover:scale-105 shadow-xl shadow-slate-200 cursor-pointer"
+                        >
+                            Try it now
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </div>
 
                     {/* Interactive Tabbed Control */}
                     <div className="flex items-center justify-start sm:justify-center gap-2 p-1 bg-slate-100/80 backdrop-blur-md rounded-full border border-slate-200 mb-8 w-full max-w-[90vw] sm:w-fit mx-auto overflow-x-auto scrollbar-hide">
                         {[
                             { id: 1, label: "1. Embed" },
                             { id: 2, label: "2. Capture" },
-                            { id: 3, label: "3. Process" },
-                            { id: 4, label: "4. Integrate" }
+                            { id: 3, label: "3. Generate Notes" }
                         ].map((step) => (
                             <button
                                 key={step.id}
                                 onClick={() => setActiveStep(step.id as any)}
                                 className={`
-                                    px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap
+                                    px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap cursor-pointer
                                     ${activeStep === step.id
                                         ? 'bg-white text-slate-900 shadow-md ring-1 ring-black/5 scale-105'
                                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
@@ -96,23 +105,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         ))}
                     </div>
 
-                    {/* <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                        <a
-                            href="https://calendly.com/clinisage/30min"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-8 py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all hover:scale-105 shadow-xl shadow-slate-200"
-                        >
-                            Book a Live Demo
-                            <ArrowRight className="w-5 h-5" />
-                        </a>
-                        <button
-                            onClick={onLaunchDemo}
-                            className="flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-slate-900 font-bold border border-slate-200 hover:bg-slate-50 transition-all"
-                        >
-                            Try Interactive Demo
-                        </button>
-                    </div> */}
                 </motion.div>
 
 
@@ -121,7 +113,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                 <div className="flex justify-center mb-8">
                     <button
                         onClick={onLaunchDemo}
-                        className="text-slate-500 hover:text-slate-800 font-semibold text-sm flex items-center gap-2 transition-colors"
+                        className="text-slate-500 hover:text-slate-800 font-semibold text-sm flex items-center gap-2 transition-colors cursor-pointer"
                     >
                         Want to customize this flow?
                         <span className="underline underline-offset-4">Open Widget Builder</span>
@@ -129,7 +121,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     </button>
                 </div>
 
-                {/* Mock EHR / Preview Section */}
+                {/* Mock EMR / Preview Section */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 40 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -137,12 +129,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     className="mt-8 relative w-full max-w-6xl mx-auto"
                 >
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
-                        {/* The Mock EHR Dashboard */}
+                        {/* The Mock EMR Dashboard */}
                         <div className={`transition-all duration-500 ease-in-out ${activeStep === 1 || activeStep === 2 || activeStep === 3 ? 'opacity-40 grayscale-[0.3] scale-[0.99]' : 'opacity-100'}`}>
-                            <MockEHR
+                            <MockEMR
                                 noteContent={demoNote}
-                                activeStep={activeStep === 1 ? 0 : activeStep - 1}
-                                onNextStep={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
+                                activeStep={activeStep === 3 ? 3 : (activeStep === 1 ? 0 : activeStep - 1)}
+                                onNextStep={() => setActiveStep(prev => (prev < 3 ? prev + 1 : 1) as any)}
                             />
                         </div>
 
@@ -155,7 +147,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                                 transcript={demoTranscript}
                                 notes={demoNote}
                                 themeColor="#0d9488"
-                                onNextStep={() => setActiveStep(prev => (prev < 4 ? prev + 1 : 1) as any)}
+                                onNextStep={() => setActiveStep(prev => (prev < 3 ? prev + 1 : 1) as any)}
                             />
                         </div>
 
@@ -173,7 +165,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                 >
                     <FeatureCard
                         icon={<Database className="w-6 h-6 text-teal-600" />}
-                        title="EHR Integrated"
+                        title="EMR Integrated"
                         description="Seamlessly embeds into your existing workflow with minimal setup."
                     />
                     <FeatureCard
@@ -209,7 +201,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                     </div>
 
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
-                        <MockEHR
+                        <MockEMR
                             type="EMR"
                             noteContent={demoNote}
                             activeStep={3} // Show it in completed state
@@ -220,6 +212,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
                         </div>
                     </div>
                 </motion.div> */}
+
+                {/* Integration & Partnership Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="mt-32 w-full max-w-4xl mx-auto text-center bg-slate-50 border border-slate-100 rounded-3xl p-12 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-teal-50 rounded-full blur-3xl opacity-60" />
+                    <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-sky-50 rounded-full blur-3xl opacity-60" />
+
+                    <div className="relative z-10">
+                        <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                            Ready to integrate this plugin into your EMR?
+                        </h2>
+                        <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto">
+                            We offer seamless integration support and developer-friendly documentation. Partner with us to bring AI-powered documentation to your platform.
+                        </p>
+                        <a
+                            href="https://calendly.com/contact-firstpeak/30min-1"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                        >
+                            Contact Us
+                            <ArrowRight className="w-4 h-4" />
+                        </a>
+                    </div>
+                </motion.div>
 
             </main>
 

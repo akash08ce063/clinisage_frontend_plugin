@@ -37,7 +37,7 @@ const Footer: React.FC<FooterProps> = ({ onLaunchDemo }) => {
                                 Dev Console
                             </button>
                             <a
-                                href="https://calendly.com/clinisage/30min"
+                                href="https://calendly.com/contact-firstpeak/30min-1"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"

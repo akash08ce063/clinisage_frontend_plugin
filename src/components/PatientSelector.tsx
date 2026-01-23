@@ -86,11 +86,11 @@ const PatientSelector: React.FC = () => {
                     }
                     setIsOpen(!isOpen);
                 }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-bold uppercase tracking-wider cursor-pointer h-8 ${currentSession?.patient_id ? 'border-sky-500 text-sky-500 bg-sky-50/50' : 'opacity-60'}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-bold uppercase tracking-wider cursor-pointer h-8 ${currentSession?.patient_id ? '' : 'opacity-60'}`}
                 style={{
-                    backgroundColor: isLight ? (currentSession?.patient_id ? 'rgba(14, 165, 233, 0.05)' : 'rgba(0,0,0,0.02)') : 'rgba(255,255,255,0.05)',
-                    borderColor: currentSession?.patient_id ? '#0ea5e9' : (isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'),
-                    color: currentSession?.patient_id ? '#0ea5e9' : textColor,
+                    backgroundColor: isLight ? (currentSession?.patient_id ? `${themeColor}15` : 'rgba(0,0,0,0.02)') : 'rgba(255,255,255,0.05)',
+                    borderColor: currentSession?.patient_id ? themeColor : (isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'),
+                    color: currentSession?.patient_id ? themeColor : textColor,
                 }}
             >
                 {isLinkingPatient ? (
@@ -133,7 +133,10 @@ const PatientSelector: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => setIsAdding(true)}
-                                        className="p-2 rounded-xl hover:bg-sky-50 transition-colors text-sky-500 cursor-pointer"
+                                        className="p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+                                        style={{ color: themeColor }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${themeColor}15`; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         title="Add New Patient"
                                     >
                                         <UserPlus className="w-4 h-4" />
@@ -144,7 +147,7 @@ const PatientSelector: React.FC = () => {
                                 <div className="max-h-[240px] overflow-y-auto no-scrollbar py-1">
                                     {isLoadingPatients ? (
                                         <div className="flex items-center justify-center py-8">
-                                            <Loader2 className="w-5 h-5 animate-spin text-sky-500" />
+                                            <Loader2 className="w-5 h-5 animate-spin" style={{ color: themeColor }} />
                                         </div>
                                     ) : filteredPatients.length > 0 ? (
                                         filteredPatients.map((patient) => (
@@ -153,7 +156,18 @@ const PatientSelector: React.FC = () => {
                                                 onClick={() => handleSelectPatient(patient.id)}
                                                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left group"
                                             >
-                                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-sky-100 group-hover:text-sky-500 transition-colors">
+                                                <div
+                                                    className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 transition-colors group-hover:bg-opacity-20"
+                                                    style={{ '--hover-color': themeColor } as any}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.backgroundColor = `${themeColor}20`;
+                                                        e.currentTarget.style.color = themeColor;
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = '#f1f5f9';
+                                                        e.currentTarget.style.color = '#94a3b8';
+                                                    }}
+                                                >
                                                     <User className="w-4 h-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -161,7 +175,7 @@ const PatientSelector: React.FC = () => {
                                                     {patient.email && <p className="text-[10px] opacity-40 truncate" style={{ color: textColor }}>{patient.email}</p>}
                                                 </div>
                                                 {currentSession?.patient_id === patient.id && (
-                                                    <Check className="w-3.5 h-3.5 text-sky-500" />
+                                                    <Check className="w-3.5 h-3.5" style={{ color: themeColor }} />
                                                 )}
                                             </button>
                                         ))
