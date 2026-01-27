@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Keyboard, Phone, ChevronDown, MessageSquare, FileText, Loader2 } from 'lucide-react';
 import { audioStreamingService } from '../lib/audioStreamingService';
+import { isLightColor } from '../lib/colorUtils';
 import { useWidget } from '../contexts/WidgetContext';
 import NotesEditor from './NotesEditor';
 import SessionSelector from './SessionSelector';
@@ -110,14 +111,21 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     className="rounded-2xl border shadow-2xl p-2 flex items-center gap-3 sm:gap-6 w-full sm:w-auto sm:min-w-[420px]"
                     style={{
                         backgroundColor: backgroundColor,
-                        borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)'
+                        borderColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)',
+                        borderStyle: 'solid',
+                        borderWidth: '1px'
                     }}
                 >
                     <div
                         className="px-3 sm:px-5 py-3 rounded-xl flex-1 ml-1 flex items-center justify-center min-h-[44px]"
-                        style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.1)' }}
+                        style={{ backgroundColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.1)' }}
                     >
-                        {isConnected ? (
+                        {isConnecting ? (
+                            <div className="flex items-center gap-2">
+                                <Loader2 className="w-4 h-4 animate-spin" style={{ color: themeColor }} />
+                                <span className="font-semibold text-sm tracking-tight" style={{ color: textColor }}>Connecting...</span>
+                            </div>
+                        ) : isConnected ? (
                             <div className="flex items-center gap-1.5 h-4">
                                 {visualizerData.slice(0, 15).map((v, i) => (
                                     <div
@@ -160,11 +168,11 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                 onExpand?.();
                             }}
                         />
-                        <div className="hidden sm:block w-px h-6 mx-1" style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }} />
+                        <div className="hidden sm:block w-px h-6 mx-1" style={{ backgroundColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }} />
                         <button
                             onClick={handleToggleConnection}
                             disabled={isConnecting}
-                            className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
+                            className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (isLightColor(backgroundColor) ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
                         >
                             <Phone className={`w-5 h-5 ${isConnected || isRecording ? 'rotate-[135deg]' : ''}`} />
                         </button>
@@ -176,7 +184,9 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     className="fixed bottom-0 left-0 right-0 sm:relative rounded-t-3xl sm:rounded-3xl border shadow-2xl w-full sm:w-[420px] flex flex-col overflow-hidden transition-all duration-300 z-[10000]"
                     style={{
                         backgroundColor: backgroundColor,
-                        borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)',
+                        borderColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)',
+                        borderStyle: 'solid',
+                        borderWidth: '1px',
                         height: 'min(520px, 85vh)'
                     }}
                 >
@@ -197,7 +207,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     </AnimatePresence>
 
                     {/* Expanded Header: Session & Patient selectors */}
-                    <div className="p-2 border-b flex flex-col sm:flex-row items-stretch sm:items-center gap-2" style={{ borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
+                    <div className="p-2 border-b flex flex-col sm:flex-row items-stretch sm:items-center gap-2" style={{ borderColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
                         <div className="flex-1 min-w-0">
                             <SessionSelector />
                         </div>
@@ -208,15 +218,15 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
 
                     {/* Tab Switcher */}
                     <div className="flex items-center gap-1 p-1 px-3 border-b"
-                        style={{ borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
+                        style={{ borderColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)' }}>
                         <button
                             onClick={() => setActiveTab('transcript')}
-                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
+                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer"
                             style={{
                                 backgroundColor: activeTab === 'transcript'
-                                    ? (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
+                                    ? (isLightColor(backgroundColor) ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
                                     : 'transparent',
-                                color: activeTab === 'transcript' ? textColor : (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)')
+                                color: activeTab === 'transcript' ? textColor : (isLightColor(backgroundColor) ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)')
                             }}
                         >
                             <MessageSquare className="w-3.5 h-3.5" />
@@ -233,12 +243,12 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                     fetchNoteDetails(latestNote.id);
                                 }
                             }}
-                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0"
+                            className="flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer"
                             style={{
                                 backgroundColor: activeTab === 'notes'
-                                    ? (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
+                                    ? (isLightColor(backgroundColor) ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
                                     : 'transparent',
-                                color: activeTab === 'notes' ? textColor : (backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)')
+                                color: activeTab === 'notes' ? textColor : (isLightColor(backgroundColor) ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)')
                             }}
                         >
                             <FileText className="w-3.5 h-3.5" />
@@ -249,12 +259,12 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     {/* Content Area */}
                     <div
                         className="flex-1 relative rounded-xl m-1 mb-2"
-                        style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
+                        style={{ backgroundColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
                     >
                         {/* Media Streaming Loading Overlay */}
                         {isWaitingForMediaStream && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400 z-30 backdrop-blur-sm"
-                                style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)' }}>
+                                style={{ backgroundColor: isLightColor(backgroundColor) ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)' }}>
                                 <Loader2 className="w-6 h-6 animate-spin" style={{ color: themeColor }} />
                                 <p className="text-[11px] font-bold uppercase tracking-widest">Initializing Media Stream...</p>
                             </div>
@@ -311,7 +321,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                     <div className="flex items-center justify-between p-3 px-4 pt-0">
                         <div
                             className="px-3 sm:px-4 py-2.5 rounded-xl flex items-center gap-1.5 flex-grow max-w-[140px] sm:max-w-[180px] h-[40px] justify-center overflow-hidden"
-                            style={{ backgroundColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
+                            style={{ backgroundColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)' }}
                         >
                             {(isConnected || isRecording) ? (
                                 <div className="flex items-center gap-1 h-full">
@@ -351,7 +361,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                             <button
                                 onClick={handleToggleConnection}
                                 disabled={isConnecting}
-                                className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (backgroundColor === '#ffffff' ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
+                                className={`p-3 sm:p-2.5 rounded-full transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${isConnecting ? 'opacity-50' : ''} ${isConnected || isRecording ? 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600' : (isLightColor(backgroundColor) ? 'bg-black/5 text-black hover:bg-black/10' : 'bg-white/5 text-white hover:bg-white/10')}`}
                             >
                                 <Phone className={`w-5 h-5 ${isConnected || isRecording ? 'rotate-[135deg]' : ''}`} />
                             </button>

@@ -7,9 +7,12 @@ import Footer from './Footer';
 
 interface LandingPageProps {
     onLaunchDemo: () => void;
+    onShowPrivacy: () => void;
+    onShowUsage: () => void;
+    onShowTerms: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, onShowUsage, onShowTerms }) => {
     // Demo content constants
     const demoTranscript = "Patient is a 45-year-old male presenting with persistent cough for 2 weeks. He reports mild shortness of breath on exertion. No history of smoking. Lungs show scattered wheezes bilaterally.";
     const demoNote = `
@@ -245,7 +248,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo }) => {
 
             </main>
 
-            <Footer onLaunchDemo={onLaunchDemo} />
+            <Footer
+                onLaunchDemo={onLaunchDemo}
+                onShowPrivacy={onShowPrivacy}
+                onShowUsage={onShowUsage}
+                onShowTerms={onShowTerms}
+            />
         </div>
     );
 };

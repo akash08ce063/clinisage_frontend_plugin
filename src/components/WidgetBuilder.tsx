@@ -18,6 +18,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
         agentName, setAgentName,
         position, setPosition,
         isUsingDefaultKey,
+        notify
     } = useWidget();
 
     const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
@@ -97,12 +98,17 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
 <script src="https://adorable-donut-d43d78.netlify.app/widget.js" async></script>
 `.trim();
 
-    const copySnippet = () => {
+    const copySnippet = async () => {
         if (isUsingDefaultKey) {
             setShowDemoModal(true);
             return;
         }
-        navigator.clipboard.writeText(snippet);
+        try {
+            await navigator.clipboard.writeText(snippet);
+            notify('Widget snippet copied to clipboard!', 'success');
+        } catch (err) {
+            notify('Failed to copy to clipboard', 'error');
+        }
     };
 
     return (

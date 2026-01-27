@@ -17,7 +17,17 @@ class ClinisageWidget extends HTMLElement {
 
         // Inject Styles
         const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
+        styleSheet.textContent = `
+            :host {
+                all: initial; /* Reset all inherited styles */
+                font-family: 'Inter', system-ui, sans-serif;
+                display: block;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            ${styles}
+        `;
         shadow.appendChild(styleSheet);
 
         // Add font link if needed (Inter) - optional but good for consistency

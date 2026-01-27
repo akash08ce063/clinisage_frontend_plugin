@@ -1,7 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Bold, Italic, Loader2, FileText } from 'lucide-react';
+import { Bold, Italic, Loader2, FileText, Download } from 'lucide-react';
 import { useWidget } from '../contexts/WidgetContext';
 import NoteTemplateSelector from './NoteTemplateSelector';
+import { isLightColor } from '../lib/colorUtils';
+import { marked } from 'marked';
+import TurndownService from 'turndown';
+import { exportToPDF } from '../lib/exportUtils';
+
 
 interface NotesEditorProps {
     isVisible: boolean;
@@ -17,14 +22,29 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
         isLoadingNotes,
         updateNote,
         isSessionSwitching,
-        isGeneratingNote
+        isGeneratingNote,
+        notify,
+        currentSession,
+        patients,
+        existingNotes,
+        templates,
+        themeColor
     } = useWidget();
+
+    const [isExporting, setIsExporting] = useState(false);
+    const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
     const [localNotes, setLocalNotes] = useState(notes);
     const editorRef = useRef<HTMLDivElement>(null);
     const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const lastSavedContent = useRef(notes);
     const isInternalChange = useRef(false);
+
+    // Initialize Turndown
+    const turndownService = useRef(new TurndownService({
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced'
+    }));
 
     const autoSave = async (content: string) => {
         if (!currentNoteId) return;
@@ -38,17 +58,19 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
     };
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-        const newContent = e.currentTarget.innerText;
-        isInternalChange.current = true;
-        setLocalNotes(newContent);
-        setNotes(newContent);
+        const html = e.currentTarget.innerHTML;
+        const markdown = turndownService.current.turndown(html);
 
-        if (currentNoteId && newContent !== lastSavedContent.current) {
+        isInternalChange.current = true;
+        setLocalNotes(markdown);
+        setNotes(markdown);
+
+        if (currentNoteId && markdown !== lastSavedContent.current) {
             if (autoSaveTimeoutRef.current) {
                 clearTimeout(autoSaveTimeoutRef.current);
             }
             autoSaveTimeoutRef.current = setTimeout(() => {
-                autoSave(newContent);
+                autoSave(markdown);
             }, 2000);
         }
 
@@ -65,10 +87,12 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
 
         // Aggressively sync the editor DOM
         if (editorRef.current && !isInternalChange.current) {
-            // Use a small timeout to ensure DOM is ready if we just switched from loader
             const syncDom = () => {
-                if (editorRef.current && editorRef.current.innerText !== notes) {
-                    editorRef.current.innerText = notes || '';
+                if (editorRef.current) {
+                    const html = marked.parse(notes || '') as string;
+                    if (editorRef.current.innerHTML !== html) {
+                        editorRef.current.innerHTML = html;
+                    }
                 }
             };
             syncDom();
@@ -88,35 +112,112 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
     const handleFormat = (command: string) => {
         document.execCommand(command, false);
         editorRef.current?.focus();
+        // Trigger handleInput manually since execCommand doesn't always trigger onInput
+        if (editorRef.current) {
+            const html = editorRef.current.innerHTML;
+            const markdown = turndownService.current.turndown(html);
+            setLocalNotes(markdown);
+            setNotes(markdown);
+        }
+    };
+
+    const handleDownloadPdf = async () => {
+        try {
+            setIsExporting(true);
+
+            // Get patient name
+            const patient = patients.find(p => p.id === currentSession?.patient_id);
+            const patientName = patient?.name || currentSession?.patient_name || 'Patient';
+            // Get note name
+            const currentNote = existingNotes.find(n => n.id === currentNoteId);
+            const template = templates.find(t => t.id === currentNote?.template_id);
+            const noteType = template?.title || 'Clinical Note';
+            // Format date
+            const now = new Date();
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+
+            // Call export utility
+            const success = await exportToPDF('clinical-note-content', {
+                patientName: patientName,
+                sessionName: noteType,
+                date: dateStr,
+                practitionerName: 'Dr. Sarah Wilson' // Hardcoded for now based on MockEMR, ideally from context
+            });
+
+            if (success) {
+                if (notify) notify('PDF Exported Successfully', 'success');
+            } else {
+                if (notify) notify('Failed to export PDF', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            if (notify) {
+                notify('Failed to export PDF', 'error');
+            }
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     if (!isVisible) return null;
 
+    const buttonStyle = (name: string) => ({
+        backgroundColor: hoveredButton === name
+            ? (isLightColor(backgroundColor) ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)')
+            : 'transparent',
+        color: hoveredButton === name
+            ? themeColor
+            : (isLightColor(backgroundColor) ? '#64748b' : '#94a3b8'), // slate-500 : slate-400
+        transition: 'all 0.2s ease',
+        cursor: 'pointer'
+    });
+
     return (
         <div className="flex flex-col h-full absolute inset-0 bg-transparent">
-            {/* Toolbar */}
             <div
                 className="flex items-center justify-between px-3 py-1.5 border-b relative gap-2"
                 style={{
-                    borderColor: backgroundColor === '#ffffff' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
-                    backgroundColor: backgroundColor === '#ffffff' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.2)'
+                    borderBottomColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)',
+                    borderBottomStyle: 'solid',
+                    borderBottomWidth: '1px',
+                    backgroundColor: isLightColor(backgroundColor) ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.2)'
                 }}
             >
                 <div className="flex items-center gap-1 overflow-hidden">
                     <button
                         onClick={() => handleFormat('bold')}
-                        className="p-1.5 px-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                        onMouseEnter={() => setHoveredButton('bold')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        className="p-1.5 px-2 rounded-lg"
+                        style={buttonStyle('bold')}
                         title="Bold"
                     >
                         <Bold className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => handleFormat('italic')}
-                        className="p-1.5 px-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                        onMouseEnter={() => setHoveredButton('italic')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        className="p-1.5 px-2 rounded-lg"
+                        style={buttonStyle('italic')}
                         title="Italic"
                     >
                         <Italic className="w-4 h-4" />
                     </button>
+                    {currentNoteId && (
+                        <button
+                            onClick={handleDownloadPdf}
+                            disabled={isExporting}
+                            onMouseEnter={() => setHoveredButton('download')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            className="p-1.5 px-2 rounded-lg disabled:opacity-50"
+                            style={buttonStyle('download')}
+                            title="Export as PDF"
+                        >
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                        </button>
+                    )}
 
                     <div className="w-px h-4 mx-2 opacity-10" style={{ backgroundColor: textColor }} />
                 </div>
@@ -144,13 +245,19 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
                 ) : (
                     <>
                         <div
+                            id="clinical-note-content"
                             ref={editorRef}
                             contentEditable
-                            className="w-full h-full p-4 pb-12 focus:outline-none overflow-y-auto no-scrollbar scrollbar-hide"
+                            className="w-full h-full p-4 pb-12 focus:outline-none overflow-y-auto no-scrollbar scrollbar-hide clinical-note-editor"
                             style={{
                                 color: textColor,
                                 fontSize: '14px',
-                                lineHeight: '1.6'
+                                lineHeight: '1.6',
+                                borderColor: isLightColor(backgroundColor) ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+                                borderStyle: 'solid',
+                                borderWidth: '1px',
+                                borderRadius: '12px',
+                                margin: '8px'
                             }}
                             onInput={handleInput}
                             suppressContentEditableWarning
@@ -171,8 +278,9 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
                     </>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 
 export default NotesEditor;
+

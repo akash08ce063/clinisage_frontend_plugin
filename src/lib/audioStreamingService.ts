@@ -230,7 +230,6 @@ class AudioStreamingServiceImpl implements AudioStreamingService {
                 } else {
                     try {
                         const data = JSON.parse(event.data);
-                        console.log('WebSocket message:', data);
                         if (data.type === 'transcription' && data.text) {
                             if (this.onTranscriptionReceived) {
                                 this.onTranscriptionReceived(data.text);
