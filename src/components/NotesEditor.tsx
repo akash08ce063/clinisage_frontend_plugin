@@ -264,7 +264,7 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
                         >
                         </div>
 
-                        {!localNotes && (
+                        {!localNotes && !isGeneratingNote && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
                                 <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center mb-3">
                                     <FileText className="w-5 h-5 text-sky-500" />
@@ -272,6 +272,19 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
                                 <h3 className="text-xs font-bold mb-1 uppercase tracking-widest opacity-60" style={{ color: textColor }}>No Clinical Note</h3>
                                 <p className="text-[11px] opacity-40 max-w-[180px] leading-relaxed" style={{ color: textColor }}>
                                     Select a template above to generate a professional clinical note.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Generating Loader - shows in editor box, hides when first character appears */}
+                        {isGeneratingNote && !localNotes && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
+                                <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center mb-3">
+                                    <Loader2 className="w-6 h-6 animate-spin text-sky-500" />
+                                </div>
+                                <h3 className="text-xs font-bold mb-1 uppercase tracking-widest text-sky-500">Generating Note</h3>
+                                <p className="text-[11px] opacity-60 max-w-[200px] leading-relaxed" style={{ color: textColor }}>
+                                    AI is analyzing the transcript and creating your clinical note...
                                 </p>
                             </div>
                         )}

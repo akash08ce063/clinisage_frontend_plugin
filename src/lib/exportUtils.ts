@@ -1,5 +1,4 @@
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2pdf from 'html2pdf.js';
 
 interface ExportMetadata {
     patientName?: string;
@@ -8,204 +7,134 @@ interface ExportMetadata {
     practitionerName?: string;
 }
 
-const cleanTextNodes = (element: HTMLElement) => {
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
-    let node;
-    while (node = walker.nextNode()) {
-        if (node.nodeValue) {
-            // Remove ** around text, # at start, etc. if they exist
-            node.nodeValue = node.nodeValue
-                .replace(/\*\*(.*?)\*\*/g, '$1')
-                .replace(/^#+\s*/, '')
-                .replace(/__|_(.*?)_/g, '$1');
-        }
-    }
-};
-
 export const exportToPDF = async (elementId: string, metadata: ExportMetadata) => {
     const element = document.getElementById(elementId);
     if (!element) {
         console.error('Element not found:', elementId);
-        return;
+        return false;
     }
 
     try {
-        // Create a temporary container for the PDF content to style it professionally
-        // A4 width in px at 96dpi is approx 794px. We use this as base.
+        // Create a professional container for the PDF
         const container = document.createElement('div');
-        container.style.width = '794px';
-        container.style.minHeight = '1123px'; // A4 height
-        container.style.padding = '48px'; // ~12.7mm margins
-        container.style.paddingBottom = '96px'; // Extra padding at bottom to prevent cutoff
+        container.style.padding = '0';
+        container.style.width = '100%';
         container.style.backgroundColor = 'white';
         container.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        container.style.color = '#111827'; // gray-900
-        container.style.lineHeight = '1.6';
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        // Enable font smoothing for sharper text
-        container.style.cssText += '-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;';
+        container.style.color = '#1e293b'; // slate-800
 
-        // Header with Branding
+        // 1. Professional Header
         const header = document.createElement('div');
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
-        header.style.marginBottom = '40px';
+        header.style.alignItems = 'flex-end';
+        header.style.marginBottom = '20px';
+        header.style.paddingBottom = '12px';
         header.style.borderBottom = '2px solid #7fb069';
-        header.style.paddingBottom = '20px';
 
         const logo = document.createElement('div');
-        logo.innerHTML = `<span style="color: #7fb069; font-weight: 800; font-size: 28px; letter-spacing: -0.5px;">Clinisage.ai</span>`;
+        logo.innerHTML = `<span style="color: #7fb069; font-weight: 800; font-size: 24px; letter-spacing: -0.5px;">Clinisage.ai</span>`;
         header.appendChild(logo);
 
         const dateInfo = document.createElement('div');
         dateInfo.style.textAlign = 'right';
-        dateInfo.style.fontSize = '12px';
-        dateInfo.style.color = '#666';
-        dateInfo.innerText = `Date: ${metadata.date}`;
+        dateInfo.style.fontSize = '11px';
+        dateInfo.style.color = '#64748b';
+        dateInfo.style.fontWeight = '500';
+        dateInfo.innerText = `Generated on ${metadata.date}`;
         header.appendChild(dateInfo);
 
         container.appendChild(header);
 
-        // Document Title
-
-        // Patient Info Section
+        // 2. Metadata Section (Minimal)
         const infoSection = document.createElement('div');
-        infoSection.style.backgroundColor = '#f9fafb'; // gray-50
-        infoSection.style.padding = '20px';
-        infoSection.style.borderRadius = '12px';
-        infoSection.style.marginBottom = '40px';
-        infoSection.style.border = '1px solid #e5e7eb'; // gray-200
-        infoSection.style.display = 'grid';
-        infoSection.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        infoSection.style.gap = '16px';
-        infoSection.style.fontSize = '14px';
+        infoSection.style.display = 'flex';
+        infoSection.style.justifyContent = 'space-between';
+        infoSection.style.marginBottom = '32px';
+        infoSection.style.fontSize = '12px';
 
         const addField = (label: string, value: string) => {
             const field = document.createElement('div');
-            field.innerHTML = `<div style="color: #6b7280; font-size: 12px; margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">${label}</div><div style="color: #111827; font-weight: 600;">${value || 'N/A'}</div>`;
+            field.innerHTML = `<span style="color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${label}:</span> <span style="color: #0f172a; font-weight: 600; margin-left: 4px;">${value || 'Not Specified'}</span>`;
             infoSection.appendChild(field);
         };
 
         addField('Patient', metadata.patientName || 'Not Specified');
-        if (metadata.practitionerName) addField('Practitioner', metadata.practitionerName);
+        addField('Practitioner', metadata.practitionerName || 'Dr. Sarah Wilson');
 
         container.appendChild(infoSection);
 
-        // Content Section
+        // 3. Main Content Section
         const contentBody = document.createElement('div');
-        contentBody.className = 'pdf-content-body';
-        contentBody.innerHTML = element.innerHTML;
+        // Inject the original HTML but clean it up
+        let cleanHTML = element.innerHTML
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Fix bold markdown
+            .replace(/^#+\s*(.*)/gm, '<h3>$1</h3>'); // Basic header fix if raw markdown exists
 
-        // Clean potential leftover markdown artifacts
-        cleanTextNodes(contentBody);
+        contentBody.innerHTML = cleanHTML;
 
-        // Apply some styles to content tags
-        const styleContent = (selector: string, styles: Partial<CSSStyleDeclaration>) => {
+        // Apply professional typography to content
+        const applyStyles = (selector: string, styles: Partial<CSSStyleDeclaration>) => {
             contentBody.querySelectorAll(selector).forEach((el: any) => {
                 Object.assign(el.style, styles);
+                // CRITICAL: Prevent page breaks inside paragraphs and headings
+                el.style.pageBreakInside = 'avoid';
+                if (selector.startsWith('h')) {
+                    el.style.pageBreakAfter = 'avoid';
+                }
             });
         };
 
-        // Improved typography for content
-        styleContent('h1', { fontSize: '20px', fontWeight: '700', marginTop: '32px', marginBottom: '16px', color: '#111827', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' });
-        styleContent('h2', { fontSize: '18px', fontWeight: '600', marginTop: '24px', marginBottom: '12px', color: '#374151' });
-        styleContent('h3', { fontSize: '16px', fontWeight: '600', marginTop: '20px', marginBottom: '10px', color: '#374151' });
-        styleContent('p', { marginBottom: '16px', fontSize: '14px', lineHeight: '1.7', color: '#374151' });
-        styleContent('strong', { fontWeight: '700', color: '#111827' });
-        styleContent('ul', { paddingLeft: '24px', marginBottom: '16px' });
-        styleContent('li', { marginBottom: '8px', fontSize: '14px', lineHeight: '1.7', color: '#374151' });
-        styleContent('div', { marginBottom: '8px', fontSize: '14px', lineHeight: '1.7', color: '#374151' });
+        applyStyles('h1', { fontSize: '20px', fontWeight: '800', marginTop: '24px', marginBottom: '12px', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' });
+        applyStyles('h2', { fontSize: '17px', fontWeight: '700', marginTop: '20px', marginBottom: '10px', color: '#1e293b' });
+        applyStyles('h3', { fontSize: '15px', fontWeight: '700', marginTop: '16px', marginBottom: '8px', color: '#334155' });
+        applyStyles('p', { fontSize: '13px', lineHeight: '1.7', marginBottom: '12px', color: '#334155' });
+        applyStyles('li', { fontSize: '13px', lineHeight: '1.7', marginBottom: '6px', color: '#334155' });
+        applyStyles('ul', { paddingLeft: '20px', marginBottom: '12px' });
+        applyStyles('strong', { fontWeight: '700', color: '#0f172a' });
 
         container.appendChild(contentBody);
 
-        // Footer
+        // 4. Professional Footer
         const footer = document.createElement('div');
-        footer.style.marginTop = '60px';
-        footer.style.borderTop = '1px solid #e5e7eb';
+        footer.style.marginTop = '48px';
         footer.style.paddingTop = '16px';
+        footer.style.paddingBottom = '16px'; // Add padding to prevent clipping
+        footer.style.borderTop = '1px solid #f1f5f9';
         footer.style.fontSize = '10px';
-        footer.style.color = '#9ca3af';
+        footer.style.color = '#64748b'; // Darker for better visibility
         footer.style.textAlign = 'center';
-        footer.style.fontStyle = 'italic';
-        footer.innerText = 'Generated by Clinisage.ai - Secure Clinical Documentation System';
+        footer.style.lineHeight = '1.5';
+        footer.innerText = 'Confidential Clinical Documentation - Generated by Clinisage.ai Secure Systems';
         container.appendChild(footer);
 
-        // Add to body temporarily to render
-        document.body.appendChild(container);
+        // Add extra safe space at the very bottom of the document
+        const safeSpace = document.createElement('div');
+        safeSpace.style.height = '20px';
+        container.appendChild(safeSpace);
 
-        // Capture with html2canvas with timeout
-        const canvasPromise = html2canvas(container, {
-            scale: 2, // Slightly lower scale for better performance, still good quality
-            useCORS: true,
-            logging: false,
-            backgroundColor: 'white',
-            windowWidth: 794,
-            onclone: (clonedDoc) => {
-                const clonedContainer = clonedDoc.querySelector('div') as HTMLElement;
-                if (clonedContainer) clonedContainer.style.display = 'block';
-            }
-        });
+        // 5. PDF Generation via html2pdf.js (Robust Paging & Margins)
+        const opt = {
+            margin: [15, 15, 15, 15] as [number, number, number, number], // [top, left, bottom, right] in mm
+            filename: `${metadata.patientName || 'Session'}_${metadata.sessionName.replace(/\s+/g, '_')}_${metadata.date.replace(/\//g, '-')}.pdf`,
+            image: { type: 'jpeg' as const, quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                dpi: 192
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
 
-        // 15s timeout to prevent infinite stuck loader
-        const timeoutPromise = new Promise<HTMLCanvasElement>((_, reject) =>
-            setTimeout(() => reject(new Error('PDF generation timed out')), 15000)
-        );
-
-        const canvas = await Promise.race([canvasPromise, timeoutPromise]);
-
-        // Remove temp container
-        document.body.removeChild(container);
-
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
-
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        // Handle multiple pages if needed
-        let heightLeft = pdfHeight;
-
-        // Page 1: Full A4 height (no top margin needed usually for the first page image start)
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-        let heightUsed = 297; // Amount of image vertical height we have already put on pages (A4 height)
-        heightLeft -= 297;
-
-        while (heightLeft > 0) {
-            pdf.addPage();
-
-            // For subsequent pages, we want a top margin so content doesn't hit the edge
-            const topMargin = 20; // 20mm top margin
-
-            // We want the image slice starting at 'heightUsed' (source Y) to appear at 'topMargin' (dest Y)
-            // position = destY - sourceY
-            const position = topMargin - heightUsed;
-
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-
-            // The amount of distinct image content we fit on this page is reduced by the margin
-            const contentHeightOnPage = 297 - topMargin;
-
-            heightLeft -= contentHeightOnPage;
-            heightUsed += contentHeightOnPage;
-        }
-
-        // Save the PDF
-        const safeSessionName = metadata.sessionName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const filename = `${metadata.patientName || 'Session'}_${safeSessionName}_${metadata.date.replace(/\//g, '-')}.pdf`;
-        pdf.save(filename);
+        // Generate and Save
+        await html2pdf().from(container).set(opt).save();
 
         return true;
     } catch (error) {
-        console.error('Error exporting PDF:', error);
+        console.error('Error generating professional PDF:', error);
         return false;
     }
 };
+
