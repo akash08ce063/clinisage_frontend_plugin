@@ -49,20 +49,28 @@ export const exportToPDF = async (elementId: string, metadata: ExportMetadata) =
         // 2. Metadata Section (Minimal)
         const infoSection = document.createElement('div');
         infoSection.style.display = 'flex';
-        infoSection.style.justifyContent = 'space-between';
+        infoSection.style.flexWrap = 'wrap'; // Add wrap for long lists
+        infoSection.style.gap = '24px'; // Better spacing
         infoSection.style.marginBottom = '32px';
         infoSection.style.fontSize = '12px';
 
         const addField = (label: string, value: string) => {
             const field = document.createElement('div');
-            field.innerHTML = `<span style="color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${label}:</span> <span style="color: #0f172a; font-weight: 600; margin-left: 4px;">${value || 'Not Specified'}</span>`;
+            field.innerHTML = `<span style="color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${label}:</span> <span style="color: #0f172a; font-weight: 600; margin-left: 4px;">${value}</span>`;
             infoSection.appendChild(field);
         };
 
-        addField('Patient', metadata.patientName || 'Not Specified');
-        addField('Practitioner', metadata.practitionerName || 'Dr. Sarah Wilson');
+        if (metadata.patientName && metadata.patientName !== 'Patient' && metadata.patientName !== 'Not Specified') {
+            addField('Patient', metadata.patientName);
+        }
 
-        container.appendChild(infoSection);
+        if (metadata.practitionerName && metadata.practitionerName !== 'Dr. Sarah Wilson') {
+            addField('Practitioner', metadata.practitionerName);
+        }
+
+        if (infoSection.children.length > 0) {
+            container.appendChild(infoSection);
+        }
 
         // 3. Main Content Section
         const contentBody = document.createElement('div');

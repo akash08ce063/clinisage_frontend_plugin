@@ -1,6 +1,6 @@
 // API Configuration
-export const API_BASE_URL = 'https://a1a1eeb086b4.ngrok-free.app/api';
-export const BACKEND_URL = 'https://a1a1eeb086b4.ngrok-free.app';
+export const API_BASE_URL = 'https://f80cfdf3c8eb.ngrok-free.app/api';
+export const BACKEND_URL = 'https://f80cfdf3c8eb.ngrok-free.app';
 export const DEFAULT_TEST_API_KEY = 'b2d195b7dec3bba177ab7c66c9ba3ffad7e8f1088db245ff9013701061902154';
 
 // Utility function to convert HTTP/HTTPS URL to WebSocket URL
