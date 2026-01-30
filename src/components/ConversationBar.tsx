@@ -144,7 +144,7 @@ const ConversationBar: React.FC<ConversationBarProps> = ({
                                 className="font-semibold text-sm tracking-tight"
                                 style={{ color: textColor }}
                             >
-                                {agentName || 'Clinisage Widget'}
+                                {agentName || 'AI Scribe'}
                             </span>
                         )}
                     </div>

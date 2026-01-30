@@ -7,10 +7,25 @@ interface ExportMetadata {
     practitionerName?: string;
 }
 
-export const exportToPDF = async (elementId: string, metadata: ExportMetadata) => {
-    const element = document.getElementById(elementId);
+export const exportToPDF = async (elementOrId: string | HTMLElement, metadata: ExportMetadata) => {
+    let element: HTMLElement | null = null;
+
+    if (typeof elementOrId === 'string') {
+        element = document.getElementById(elementOrId);
+
+        // If not found in main document, it might be in Shadow DOM
+        if (!element) {
+            const widget = document.querySelector('clinisage-speech-widget');
+            if (widget && widget.shadowRoot) {
+                element = widget.shadowRoot.querySelector('#' + elementOrId) as HTMLElement;
+            }
+        }
+    } else {
+        element = elementOrId;
+    }
+
     if (!element) {
-        console.error('Element not found:', elementId);
+        console.error('Element not found:', elementOrId);
         return false;
     }
 

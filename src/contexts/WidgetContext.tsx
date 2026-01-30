@@ -125,7 +125,7 @@ export const WidgetProvider: React.FC<{
     const [themeColor, setThemeColor] = useState(config?.themeColor || '#0ea5e9');
     const [backgroundColor, setBackgroundColor] = useState(config?.backgroundColor || '#ffffff');
     const [textColor, setTextColor] = useState(config?.textColor || '#000000');
-    const [agentName, setAgentName] = useState(config?.agentName || 'Voice Assistant');
+    const [agentName, setAgentName] = useState(config?.agentName || 'AI Scribe');
     const [position, setPosition] = useState<WidgetPosition>(config?.position || 'bottom-right');
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
     const [existingNotes, setExistingNotes] = useState<NoteOut[]>([]);

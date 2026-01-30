@@ -268,7 +268,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, 
                                     Try Complete Medical AI Scribe Platform
                                 </h2>
                                 <p className="text-lg text-slate-300 font-medium leading-relaxed max-w-2xl">
-                                    Standalone, fully-featured Clinisage AI Scribe?
+                                    Standalone, fully-featured Clinisage Medical AI Scribe
                                 </p>
                             </div>
 

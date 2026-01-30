@@ -191,7 +191,7 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
             const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
             // Call export utility
-            const success = await exportToPDF('clinical-note-content', {
+            const success = await exportToPDF(editorRef.current || 'clinical-note-content', {
                 patientName: patientName,
                 sessionName: noteType,
                 date: dateStr,
