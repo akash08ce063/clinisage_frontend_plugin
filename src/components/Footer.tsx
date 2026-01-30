@@ -24,7 +24,7 @@ const Footer: React.FC<FooterProps> = ({ onLaunchDemo, onShowPrivacy, onShowUsag
                             <span className="text-xl font-bold text-slate-800 tracking-tight">Clinisage</span>
                         </div>
                         <p className="text-slate-500 text-sm max-w-xs text-center md:text-left leading-relaxed">
-                            Next-generation AI medical scribe for modern healthcare workflows.
+                            Embeddable AI Medical Scribe for Any EMR
                         </p>
                     </div>
 

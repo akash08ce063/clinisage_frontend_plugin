@@ -90,12 +90,12 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
     agentName: "${agentName}",
     themeColor: "${themeColor}",
     backgroundColor: "${backgroundColor}",
-    textColor: "${textColor}",
+    textColor: "${textColor}", 
     position: "${position}",
     apiKey: "${displayKey}",
   };
 </script>
-<script src="https://adorable-donut-d43d78.netlify.app/widget.js" async></script>
+<script src="https://plugin.clinisage.firstpeak.ai/widget.js" async></script>
 `.trim();
 
     const copySnippet = async () => {

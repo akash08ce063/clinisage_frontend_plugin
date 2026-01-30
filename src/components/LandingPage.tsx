@@ -216,21 +216,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, 
                     </div>
                 </motion.div> */}
 
+
+
                 {/* Integration & Partnership Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="mt-32 w-full max-w-4xl mx-auto text-center bg-slate-50 border border-slate-100 rounded-3xl p-12 relative overflow-hidden"
+                    className="mt-32 w-full max-w-5xl mx-auto text-center bg-slate-50 border border-slate-100 rounded-3xl p-12 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-teal-50 rounded-full blur-3xl opacity-60" />
                     <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-sky-50 rounded-full blur-3xl opacity-60" />
 
                     <div className="relative z-10">
                         <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                            Ready to integrate this plugin into your EMR?
+                            Ready to integrate this AI medical scribe plugin into your EMR?
                         </h2>
+
                         <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto">
                             We offer seamless integration support and developer-friendly documentation. Partner with us to bring AI-powered documentation to your platform.
                         </p>
@@ -243,6 +246,42 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, 
                             Contact Us
                             <ArrowRight className="w-4 h-4" />
                         </a>
+                    </div>
+                </motion.div>
+
+
+                {/* Standalone Scribe Promo Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="mt-32 w-full max-w-5xl mx-auto"
+                >
+                    <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 sm:p-12 shadow-2xl ring-1 ring-white/10 text-center sm:text-left">
+                        {/* Abstract Background */}
+                        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-gradient-to-br from-teal-500/20 to-sky-500/20 blur-3xl opacity-50 rounded-full pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="flex-1">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-3">
+                                    Try Complete Medical AI Scribe Platform
+                                </h2>
+                                <p className="text-lg text-slate-300 font-medium leading-relaxed max-w-2xl">
+                                    Standalone, fully-featured Clinisage AI Scribe?
+                                </p>
+                            </div>
+
+                            <a
+                                href="https://clinisage.firstpeak.ai/auth"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-white text-slate-900 font-bold hover:bg-teal-50 transition-all duration-300 shadow-xl shadow-black/20 hover:scale-105 whitespace-nowrap"
+                            >
+                                Try Now
+                                <ArrowRight className="w-5 h-5 text-teal-600 group-hover:translate-x-1 transition-transform" />
+                            </a>
+                        </div>
                     </div>
                 </motion.div>
 

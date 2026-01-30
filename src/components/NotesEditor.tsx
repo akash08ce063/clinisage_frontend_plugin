@@ -243,15 +243,15 @@ const NotesEditor: React.FC<NotesEditorProps> = ({ isVisible }) => {
                     line-height: 1.2;
                 }
                 .clinical-note-editor h1 { 
-                    font-size: 1.5rem; 
+                    font-size: 1.1rem; 
                     border-bottom: 2px solid rgba(0,0,0,0.1); 
                     padding-bottom: 0.5rem; 
                 }
                 .clinical-note-editor h2 { 
-                    font-size: 1.25rem; 
+                    font-size: 1.1rem; 
                 }
                 .clinical-note-editor h3 { 
-                    font-size: 1.1rem; 
+                    font-size: 1rem; 
                 }
                 
                 .clinical-note-editor p {
