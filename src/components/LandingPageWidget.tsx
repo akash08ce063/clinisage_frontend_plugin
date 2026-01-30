@@ -97,7 +97,7 @@ const LandingPageWidget: React.FC<LandingPageWidgetProps> = ({
 
     const VoiceAssistantBadge = () => (
         <div className="bg-[#f1f5f9] px-6 py-3 rounded-2xl flex items-center justify-center min-h-[50px]">
-            <span className="text-[14px] font-bold text-slate-900 tracking-tight">Voice Assistant</span>
+            <span className="text-[14px] font-bold text-slate-900 tracking-tight">AI Scribe</span>
         </div>
     );
 

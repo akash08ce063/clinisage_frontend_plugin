@@ -338,7 +338,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({ onBack }) => {
                                     className="w-full h-full flex items-center justify-center relative"
                                 >
                                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-                                    <div className={`absolute inset-0 p-8 flex ${position === 'top-left' ? 'items-start justify-start' :
+                                    <div className={`absolute inset-0 p-0 sm:p-8 flex ${position === 'top-left' ? 'items-start justify-start' :
                                         position === 'top-right' ? 'items-start justify-end' :
                                             position === 'bottom-left' ? 'items-end justify-start' :
                                                 'items-end justify-end'

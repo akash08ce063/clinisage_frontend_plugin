@@ -131,7 +131,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, 
                     transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                     className="mt-8 relative w-full max-w-6xl mx-auto"
                 >
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
+                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 bg-white h-[500px] sm:h-auto sm:aspect-[16/10] lg:aspect-[16/9] group ring-1 ring-slate-900/5">
                         {/* The Mock EMR Dashboard */}
                         <div className={`transition-all duration-500 ease-in-out ${activeStep === 1 || activeStep === 2 || activeStep === 3 ? 'opacity-40 grayscale-[0.3] scale-[0.99]' : 'opacity-100'}`}>
                             <MockEMR
@@ -268,7 +268,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDemo, onShowPrivacy, 
                                     Try Complete Medical AI Scribe Platform
                                 </h2>
                                 <p className="text-lg text-slate-300 font-medium leading-relaxed max-w-2xl">
-                                    Standalone, fully-featured Clinisage AI Scribe?
+                                    Standalone, fully-featured Clinisage Medical AI Scribe
                                 </p>
                             </div>
 
