@@ -1,4 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { isLightColor } from '../lib/colorUtils';
+import { useClickOutside } from '../hooks/useClickOutside';
+
 import { Search, FileText, Plus, ChevronDown, Trash2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWidget } from '../contexts/WidgetContext';
@@ -27,24 +30,16 @@ const NoteTemplateSelector: React.FC = () => {
         t.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useClickOutside(containerRef, () => {
+        setIsOpen(false);
+    });
 
     const handleSelectTemplate = (templateId: string) => {
-        console.log('NoteTemplateSelector: handleSelectTemplate called with:', templateId);
         setIsOpen(false);
         generateNote(templateId);
     };
 
     const handleSelectExistingNote = (noteId: string) => {
-        console.log('NoteTemplateSelector: handleSelectExistingNote called with:', noteId);
         setIsOpen(false);
         fetchNoteDetails(noteId);
     };
@@ -77,7 +72,7 @@ const NoteTemplateSelector: React.FC = () => {
         ? getNoteTitle(currentNoteObj)
         : `Notes ${existingNotes.length > 0 ? `(${existingNotes.length})` : ''}`;
 
-    const isLight = backgroundColor === '#ffffff';
+    const isLight = isLightColor(backgroundColor);
 
     return (
         <div className="relative min-w-0" ref={containerRef}>

@@ -181,14 +181,12 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const setSessionId = useCallback((id: string) => {
-        console.log('WidgetContext: setSessionId called with:', id);
         setSessionIdState(id);
     }, []);
 
     // Setup callback for media streaming started event
     useEffect(() => {
         audioStreamingService.setOnMediaStreamingStarted(() => {
-            console.log('Media streaming started - hiding loader');
             setIsWaitingForMediaStream(false);
         });
     }, []);
@@ -244,7 +242,6 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const selectSession = useCallback(async (id: string) => {
-        console.log('WidgetContext: selectSession called with:', id);
         setIsSessionSwitching(true);
         // Clear current session data while loading to prevent ghosting
         setTranscript('');
@@ -564,12 +561,10 @@ export const WidgetProvider: React.FC<{
     }, []);
 
     const fetchNoteDetails = useCallback(async (noteId: string) => {
-        console.log('WidgetContext: fetchNoteDetails called with:', noteId);
 
         // Optimization: check if we already have the note text in our existingNotes list
         const existingNote = existingNotes.find(n => n.id === noteId);
         if (existingNote && existingNote.note_text !== undefined) {
-            console.log('WidgetContext: fetchNoteDetails using local data');
             setNotes(existingNote.note_text);
             setCurrentNoteId(existingNote.id || null);
             return;
@@ -578,7 +573,6 @@ export const WidgetProvider: React.FC<{
         try {
             setIsLoadingNotes(true);
             const note = await noteApi.getNoteById(noteId);
-            console.log('WidgetContext: fetchNoteDetails success:', note.id);
             setNotes(note.note_text);
             setCurrentNoteId(note.id || null);
         } catch (err) {
@@ -596,7 +590,6 @@ export const WidgetProvider: React.FC<{
             return;
         }
 
-        console.log('WidgetContext: generateNote called with:', templateId);
         if (!currentSession) {
             console.warn('WidgetContext: generateNote aborted - no currentSession');
             notify('Please select or create a session first', 'error');
@@ -625,7 +618,6 @@ export const WidgetProvider: React.FC<{
                     setNotes(prev => prev + chunk);
                 },
                 async (noteId) => {
-                    console.log('Note generation complete');
                     if (noteId) {
                         setCurrentNoteId(noteId);
                         // Refresh existing notes list

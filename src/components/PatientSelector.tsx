@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { isLightColor } from '../lib/colorUtils';
+
 import { Search, ChevronDown, User, Loader2, Check, X, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWidget } from '../contexts/WidgetContext';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 const PatientSelector: React.FC = () => {
     const {
@@ -31,15 +34,7 @@ const PatientSelector: React.FC = () => {
         }
     }, [isOpen, patients.length, fetchPatients]);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useClickOutside(dropdownRef, () => setIsOpen(false));
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -71,7 +66,7 @@ const PatientSelector: React.FC = () => {
         }
     };
 
-    const isLight = backgroundColor === '#ffffff';
+    const isLight = isLightColor(backgroundColor);
 
     const selectedPatient = patients.find(p => p.id === currentSession?.patient_id);
     const displayName = selectedPatient?.name || currentSession?.patient_name || 'Select Patient';
@@ -89,8 +84,10 @@ const PatientSelector: React.FC = () => {
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[11px] font-bold uppercase tracking-wider cursor-pointer h-8 ${currentSession?.patient_id ? '' : 'opacity-60'}`}
                 style={{
                     backgroundColor: isLight ? (currentSession?.patient_id ? `${themeColor}15` : 'rgba(0,0,0,0.02)') : 'rgba(255,255,255,0.05)',
-                    borderColor: currentSession?.patient_id ? themeColor : (isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'),
+                    borderColor: currentSession?.patient_id ? themeColor : (isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)'),
                     color: currentSession?.patient_id ? themeColor : textColor,
+                    borderStyle: 'solid',
+                    borderWidth: '1px'
                 }}
             >
                 {isLinkingPatient ? (

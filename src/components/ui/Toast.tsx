@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, CheckCircle, Info, X } from 'lucide-react';
+import { isLightColor } from '../../lib/colorUtils';
 
 
 interface ToastProps {
@@ -28,7 +29,7 @@ const Toast: React.FC<ToastProps> = ({
         }
     }, [duration, onClose]);
 
-    const isLight = backgroundColor === '#ffffff';
+    const isLight = isLightColor(backgroundColor);
 
     const getIcon = () => {
         switch (type) {

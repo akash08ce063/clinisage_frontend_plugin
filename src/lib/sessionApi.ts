@@ -65,22 +65,19 @@ class SessionApi {
     }
 
     async getSessionById(sessionId: string): Promise<Session> {
-        console.log(`SessionApi: getSessionById called for ${sessionId}`);
+        (`SessionApi: getSessionById called for ${sessionId}`);
         try {
             const headers = await this.getAuthHeaders();
-            console.log('SessionApi: build request for', `${this.baseUrl}${sessionId}`, 'with headers:', headers);
             const response = await fetch(`${this.baseUrl}${sessionId}`, {
                 method: 'GET',
                 headers
             });
-            console.log(`SessionApi: getSessionById response status: ${response.status}`);
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error(`SessionApi: getSessionById failed: ${response.status} ${errorText}`);
                 throw new Error('Failed to fetch session');
             }
             const data = await response.json();
-            console.log('SessionApi: getSessionById data received:', data.id);
             return data;
         } catch (error) {
             console.error('Error fetching session:', error);

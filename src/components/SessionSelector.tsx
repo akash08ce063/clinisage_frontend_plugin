@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Search, Plus, ChevronDown, Calendar, Loader2, Check, Trash2, Edit2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWidget } from '../contexts/WidgetContext';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 const SessionSelector: React.FC = () => {
     const {
@@ -22,15 +23,7 @@ const SessionSelector: React.FC = () => {
     const [editName, setEditName] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useClickOutside(dropdownRef, () => setIsOpen(false));
 
     const filteredSessions = sessions
         .filter(session =>
@@ -67,10 +60,15 @@ const SessionSelector: React.FC = () => {
         <div className="relative w-full text-slate-900" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl hover:bg-white transition-all duration-200 group pointer-events-auto"
-                style={{ '--hover-color': themeColor } as any}
+                className="w-full flex items-center cursor-pointer justify-between gap-3 px-3 py-2 bg-slate-50 border transition-all duration-200 group pointer-events-auto rounded-xl"
+                style={{
+                    '--hover-color': themeColor,
+                    borderColor: isOpen ? themeColor : 'rgba(148, 163, 184, 0.2)', // slate-400 at 20%
+                    borderStyle: 'solid',
+                    borderWidth: '1px'
+                } as any}
                 onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${themeColor}80`; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; }}
+                onMouseLeave={(e) => { if (!isOpen) e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.2)'; }}
             >
                 <div className="flex items-center gap-2.5 overflow-hidden">
                     <div
@@ -99,8 +97,8 @@ const SessionSelector: React.FC = () => {
                         className="absolute top-full left-[-8px] mt-1 w-[calc(400px-16px)] z-[100] bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden pointer-events-auto"
                     >
                         <div className="p-2 border-b border-slate-100 bg-slate-50/50">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <div className="relative flex items-center">
+                                <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -201,9 +199,7 @@ const SessionSelector: React.FC = () => {
                                                         style={currentSession?.id === session.id ? { color: themeColor } : {}}>
                                                         {session.name || 'Untitled Session'}
                                                     </p>
-                                                    {currentSession?.id === session.id && (
-                                                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: themeColor }} />
-                                                    )}
+                                                    {/* Check icon removed */}
                                                 </div>
                                                 <p className="text-[11px] text-slate-400">
                                                     {formatDate(session.created_at)}
@@ -260,7 +256,7 @@ const SessionSelector: React.FC = () => {
                             <button
                                 onClick={handleCreateNew}
                                 disabled={isLoadingSessions}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-dashed border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
+                                className="w-full flex items-center justify-center  gap-2 px-4 py-2.5 bg-white border border-dashed border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
                                 style={{ '--hover-color': themeColor } as any}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.borderColor = themeColor;
